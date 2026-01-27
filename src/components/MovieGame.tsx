@@ -167,8 +167,8 @@ const MovieCard = ({
 
       {/* Reveal Overlay */}
       {reveal && (
-        <div className="absolute inset-0 z-30 flex items-center justify-center animate-scale-in">
-          <div className="flex flex-col items-center justify-center p-6 text-center">
+        <div className="absolute inset-0 z-30 flex items-center justify-center pb-24 sm:pb-32 animate-scale-in">
+          <div className="flex flex-col items-center justify-center p-6 text-center bg-black/50 backdrop-blur-sm rounded-2xl">
              {/* Huge Stamp Feedback - Only on selected card */}
              {isSelected && (isWinner ? (
                 <div className="font-display text-5xl sm:text-7xl text-success tracking-tighter uppercase -rotate-6 border-4 border-success px-4 py-2 opacity-90 drop-shadow-[0_0_15px_rgba(16,185,129,0.5)]">
@@ -310,7 +310,7 @@ export default function MovieGame({ movies }: MovieGameProps) {
         
         <div className="space-y-8 max-w-2xl relative z-10 animate-fade-in">
           <div className="inline-block px-4 py-1.5 border border-white/10 rounded-full bg-white/5 backdrop-blur-sm">
-             <span className="text-xs font-mono text-accent uppercase tracking-[0.3em]">CineScore Duel</span>
+             <span className="text-xs font-mono text-accent uppercase tracking-[0.3em]">CineClash</span>
           </div>
           
           <h1 className="font-display text-7xl sm:text-9xl leading-[0.8] tracking-tighter text-transparent bg-clip-text bg-gradient-to-b from-white to-white/50">
@@ -378,7 +378,7 @@ export default function MovieGame({ movies }: MovieGameProps) {
 
                   {/* Header */}
                   <h1 className="font-display text-3xl sm:text-5xl text-sky-900 uppercase tracking-widest mb-1 opacity-90">
-                    CineScore Duel
+                    CineClash
                   </h1>
                   <div className="font-mono text-[10px] text-sky-900/50 uppercase tracking-[0.4em] mb-6">
                     {new Date().toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
@@ -391,7 +391,7 @@ export default function MovieGame({ movies }: MovieGameProps) {
                      </div>
                      
                      <div className="flex flex-col items-center">
-                        <span className="font-display text-8xl sm:text-9xl text-sky-600 leading-[0.85] tracking-tighter drop-shadow-sm">
+                        <span className="font-display text-8xl sm:text-9xl text-sky-600 leading-[0.85] tracking-normal drop-shadow-sm">
                           {state.score}
                         </span>
                         <div className="px-3 py-1 bg-sky-900/5 rounded-full mt-2">

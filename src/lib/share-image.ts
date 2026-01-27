@@ -92,7 +92,7 @@ export const renderShareImage = async ({
   posterPath,
   scoreText,
   sessionLength,
-  title = "CineScore Duel",
+  title = "CineClash",
   attribution,
 }: ShareImageOptions) => {
   const canvas = document.createElement("canvas");

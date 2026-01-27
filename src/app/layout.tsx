@@ -16,7 +16,7 @@ const bodyFont = Manrope({
 });
 
 export const metadata: Metadata = {
-  title: "CineScore Duel",
+  title: "CineClash",
   description:
     "Pick which movie has the higher IMDb rating and share your score.",
 };

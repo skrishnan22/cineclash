@@ -1,4 +1,4 @@
-export const APP_NAME = "CineScore Duel";
+export const APP_NAME = "CineClash";
 export const SHARE_DESCRIPTION =
   "Pick which movie has the higher IMDb rating and share your score.";
 
