@@ -1,25 +1,35 @@
 @import "tailwindcss";
 
 :root {
-  --background: #f6efe5;
-  --foreground: #1c1f2a;
-  --accent: #c48a3b;
-  --accent-strong: #a96d24;
-  --card: rgba(255, 255, 255, 0.78);
-  --card-border: rgba(15, 23, 42, 0.12);
+  --background: #09090b; /* Zinc 950 */
+  --foreground: #fafafa; /* Zinc 50 */
+  --accent: #eab308; /* Yellow 500 */
+  --accent-glow: rgba(234, 179, 8, 0.5);
+  --success: #10b981; /* Emerald 500 */
+  --success-glow: rgba(16, 185, 129, 0.5);
+  --error: #f43f5e; /* Rose 500 */
+  --error-glow: rgba(244, 63, 94, 0.5);
+  --card: #18181b; /* Zinc 900 */
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-accent: var(--accent);
+  --color-success: var(--success);
+  --color-error: var(--error);
   --color-card: var(--card);
-  --color-card-border: var(--card-border);
+  
   --font-sans: var(--font-body);
-  --animate-fade-slide-up: fadeSlideUp 0.4s ease-out both;
-  --animate-heart-break: heartBreak 0.5s ease-out both;
-  --animate-wrong-shake: wrongShake 0.4s ease-out;
-  --animate-pulse-gold: pulseGold 1.5s ease-in-out infinite;
+  --font-display: var(--font-title);
+
+  --animate-fade-in: fadeIn 0.6s ease-out forwards;
+  --animate-slide-up: slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  --animate-scale-in: scaleIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+  --animate-shake: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
+  --animate-glitch: glitch 1s linear infinite;
+  --animate-pulse-glow: pulseGlow 2s ease-in-out infinite;
+  --animate-heart-break: heartBreak 0.8s ease-in-out forwards;
 }
 
 body {
@@ -27,100 +37,159 @@ body {
   color: var(--foreground);
   font-family: var(--font-body);
   min-height: 100vh;
+  overflow-x: hidden;
 }
 
-/* Film grain overlay */
+/* Cinematic Grain Overlay */
 body::before {
   content: "";
   position: fixed;
   inset: 0;
   z-index: 9999;
   pointer-events: none;
-  opacity: 0.04;
-  background: repeating-conic-gradient(#000 0% 25%, transparent 0% 50%) 0 0 / 4px 4px;
-  mix-blend-mode: overlay;
+  opacity: 0.05;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
 }
 
-h1,
-h2,
-h3 {
+h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-title);
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
 }
 
-/* Keyframes */
-@keyframes fadeSlideUp {
-  from {
-    opacity: 0;
-    transform: translateY(12px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+/* Utilities for Neon vibe */
+.text-glow {
+  text-shadow: 0 0 20px var(--accent-glow);
+}
+
+.text-glow-success {
+  text-shadow: 0 0 20px var(--success-glow);
+}
+
+.text-glow-error {
+  text-shadow: 0 0 20px var(--error-glow);
+}
+
+.box-glow {
+  box-shadow: 0 0 30px -5px var(--accent-glow);
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.9); }
+  to { opacity: 1; transform: scale(1); }
 }
 
 @keyframes heartBreak {
-  0% {
-    transform: scale(1);
-    opacity: 1;
-  }
-  30% {
-    transform: scale(1.25);
-    opacity: 1;
-  }
-  100% {
-    transform: scale(0.85);
-    opacity: 0.35;
-  }
+  0% { transform: scale(1); opacity: 1; fill: var(--error); }
+  20% { transform: scale(1.3); }
+  40% { transform: scale(1.3) rotate(-10deg); }
+  60% { transform: scale(1.3) rotate(10deg); }
+  100% { transform: scale(0); opacity: 0; }
 }
 
-@keyframes wrongShake {
-  0%,
-  100% {
-    transform: translateX(0);
-  }
-  20% {
-    transform: translateX(-3px);
-  }
-  40% {
-    transform: translateX(3px);
-  }
-  60% {
-    transform: translateX(-2px);
-  }
-  80% {
-    transform: translateX(2px);
-  }
+@keyframes shake {
+  10%, 90% { transform: translate3d(-1px, 0, 0); }
+  20%, 80% { transform: translate3d(2px, 0, 0); }
+  30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+  40%, 60% { transform: translate3d(4px, 0, 0); }
 }
 
-@keyframes pulseGold {
-  0%,
-  100% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(1.08);
-  }
+@keyframes pulseGlow {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; text-shadow: 0 0 30px var(--accent-glow); }
 }
 
-/* Film strip perforation border */
-.film-strip-border {
+.clip-path-button {
+  clip-path: polygon(10% 0, 100% 0, 100% 70%, 90% 100%, 0 100%, 0 30%);
+}
+
+.clip-path-slant {
+  clip-path: polygon(10px 0, 100% 0, calc(100% - 10px) 100%, 0 100%);
+}
+
+/* Vintage Ticket Classes */
+
+.vintage-ticket-blue {
+  background-color: #38bdf8; /* Sky-400 */
+}
+
+/* The outer ticket container with inward curves at corners */
+.ticket-classic {
+  /* Using Sky-400 (#38bdf8) for a lighter sky blue tone */
+  background: radial-gradient(circle at top left, transparent 15px, #38bdf8 16px),
+              radial-gradient(circle at top right, transparent 15px, #38bdf8 16px),
+              radial-gradient(circle at bottom left, transparent 15px, #38bdf8 16px),
+              radial-gradient(circle at bottom right, transparent 15px, #38bdf8 16px);
+  background-position: top left, top right, bottom left, bottom right;
+  background-size: 51% 51%;
+  background-repeat: no-repeat;
   position: relative;
+  filter: drop-shadow(0 10px 20px rgba(0,0,0,0.5));
 }
-.film-strip-border::after {
+
+/* The separation line notches (top and bottom center-ish) */
+/* We can use a pseudo element for the separation line and notches */
+.ticket-classic::before {
   content: "";
   position: absolute;
-  bottom: -3px;
-  left: 24px;
-  right: 24px;
-  height: 3px;
-  background: repeating-linear-gradient(
-    90deg,
-    var(--accent) 0px,
-    var(--accent) 8px,
-    transparent 8px,
-    transparent 14px
-  );
-  border-radius: 2px;
-  opacity: 0.3;
+  top: -10px;
+  bottom: -10px;
+  left: 28%; /* Stub split */
+  border-left: 2px dashed rgba(0,0,0,0.2);
+  /* The notches */
+  mask: radial-gradient(circle at center, transparent 10px, black 11px) repeat-y;
+  mask-size: 20px 20px;
+  /* Actually, mask on a border is tricky. 
+     Let's do notches on the container itself using another layer of radial gradients 
+     or just simple pseudo elements for the 'holes' at the top/bottom of the dashed line.
+  */
+}
+
+/* Let's try a cleaner approach for the notches at the dashed line */
+.ticket-classic::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 28%;
+  width: 20px;
+  transform: translateX(-50%);
+  background: 
+    radial-gradient(circle at top center, #09090b 10px, transparent 11px),
+    radial-gradient(circle at bottom center, #09090b 10px, transparent 11px);
+  background-repeat: no-repeat;
+  background-position: top, bottom;
+}
+
+/* The dashed line itself */
+.ticket-dashed-line {
+  position: absolute;
+  top: 10px;
+  bottom: 10px;
+  left: 28%;
+  border-left: 3px dashed rgba(0,0,0,0.15);
+  transform: translateX(-50%);
+}
+
+.ticket-cream-bg {
+  background-color: #fdf6e7; /* Warm cream/parchment */
+  /* Subtle paper grain */
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='paperNoise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23paperNoise)' opacity='0.15'/%3E%3C/svg%3E");
+}
+
+.vertical-text {
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  transform: rotate(180deg);
 }

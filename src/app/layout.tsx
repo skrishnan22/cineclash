@@ -1,17 +1,18 @@
 import type { Metadata } from "next";
-import { Cinzel, Source_Sans_3 } from "next/font/google";
+import { Anton, Manrope } from "next/font/google";
 import "./globals.css";
 
-const titleFont = Cinzel({
+const titleFont = Anton({
   variable: "--font-title",
   subsets: ["latin"],
-  weight: ["400", "600", "700"],
+  weight: "400",
+  display: "swap",
 });
 
-const bodyFont = Source_Sans_3({
+const bodyFont = Manrope({
   variable: "--font-body",
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
+  display: "swap",
 });
 
 export const metadata: Metadata = {

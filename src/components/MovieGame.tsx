@@ -16,14 +16,15 @@ type MovieGameProps = {
   movies: Movie[];
 };
 
+/* ------------------------------------------------------------------ */
+/*  Helpers                                                           */
+/* ------------------------------------------------------------------ */
 
 const formatRating = (rating: number | null) =>
   rating === null ? "N/A" : rating.toFixed(1);
 
 const formatDuration = (start: number | null, end: number | null) => {
-  if (!start || !end) {
-    return "0:00";
-  }
+  if (!start || !end) return "0:00";
   const totalSeconds = Math.max(0, Math.round((end - start) / 1000));
   const minutes = Math.floor(totalSeconds / 60);
   const seconds = totalSeconds % 60;
@@ -31,10 +32,7 @@ const formatDuration = (start: number | null, end: number | null) => {
 };
 
 const getPosterUrl = (movie: Movie) => {
-  if (movie.posterUrl) {
-    return movie.posterUrl;
-  }
-
+  if (movie.posterUrl) return movie.posterUrl;
   if (movie.posterPath) {
     const params = new URLSearchParams({
       id: movie.id,
@@ -44,64 +42,59 @@ const getPosterUrl = (movie: Movie) => {
     });
     return `/api/poster?${params.toString()}`;
   }
-
   return null;
 };
 
 /* ------------------------------------------------------------------ */
-/*  Inline SVG icon components                                        */
+/*  Icons                                                             */
 /* ------------------------------------------------------------------ */
 
-const HeartIcon = ({
-  filled,
-  breaking,
-}: {
-  filled: boolean;
-  breaking?: boolean;
-}) => (
-  <svg
-    viewBox="0 0 24 24"
-    className={`h-6 w-6 transition-all duration-300 ${
-      filled
-        ? "fill-[#e04050] text-[#e04050]"
-        : "fill-none text-slate-300"
-    } ${breaking ? "animate-heart-break" : ""}`}
-    aria-hidden="true"
-  >
-    <path
-      d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"
-      strokeWidth={filled ? 0 : 2}
-      stroke="currentColor"
-    />
-  </svg>
+const HeartIcon = ({ filled, breaking }: { filled: boolean; breaking?: boolean }) => (
+  <div className="relative w-6 h-6">
+    {/* Empty Heart Background (Always visible as placeholder) */}
+    <svg
+      viewBox="0 0 24 24"
+      className="absolute inset-0 w-6 h-6 fill-none text-zinc-800"
+    >
+      <path
+        fillRule="evenodd"
+        clipRule="evenodd"
+        d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"
+      />
+    </svg>
+
+    {/* Filled Heart (Visible when filled or breaking) */}
+    {(filled || breaking) && (
+      <svg
+        viewBox="0 0 24 24"
+        className={`absolute inset-0 w-6 h-6 transition-all duration-300 fill-error text-error drop-shadow-[0_0_8px_rgba(244,63,94,0.6)] ${
+          breaking ? "animate-heart-break" : ""
+        }`}
+      >
+        <path
+          fillRule="evenodd"
+          clipRule="evenodd"
+          d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"
+        />
+      </svg>
+    )}
+  </div>
 );
 
-const CheckIcon = () => (
-  <svg viewBox="0 0 20 20" className="h-4 w-4 fill-current" aria-hidden="true">
-    <path d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" />
-  </svg>
-);
-
-const XIcon = () => (
-  <svg viewBox="0 0 20 20" className="h-4 w-4 fill-current" aria-hidden="true">
-    <path d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" />
+const BoltIcon = () => (
+  <svg viewBox="0 0 24 24" className="w-8 h-8 fill-accent text-accent animate-pulse-glow" aria-hidden="true">
+    <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
   </svg>
 );
 
 const StarIcon = () => (
-  <svg viewBox="0 0 16 16" className="h-3.5 w-3.5 fill-current" aria-hidden="true">
-    <path d="M8 0l2.5 5 5.5.8-4 3.9.9 5.3L8 12.5 3.1 15l.9-5.3-4-3.9L5.5 5z" />
-  </svg>
-);
-
-const FlameIcon = () => (
-  <svg viewBox="0 0 20 20" className="h-4 w-4 fill-current" aria-hidden="true">
-    <path d="M12.395 2.553a1 1 0 00-1.45-.385c-.345.23-.614.558-.822.88-.214.33-.403.713-.57 1.116-.334.804-.614 1.768-.84 2.734a31.365 31.365 0 00-.613 3.58 2.64 2.64 0 01-.945-1.067c-.328-.68-.398-1.534-.398-2.654A1 1 0 005.05 6.05 6.981 6.981 0 003 11a7 7 0 1011.95-4.95c-.592-.591-.98-.985-1.348-1.467-.363-.476-.724-1.063-1.207-2.03zM12.12 15.12A3 3 0 017 13s.879.5 2.5.5c0-1 .5-4 1.25-4.5.5 1 .786 1.293 1.371 1.879A2.99 2.99 0 0113 13a2.99 2.99 0 01-.879 2.121z" />
+  <svg viewBox="0 0 24 24" className="w-5 h-5 fill-accent text-accent" aria-hidden="true">
+    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
   </svg>
 );
 
 /* ------------------------------------------------------------------ */
-/*  MovieCard                                                          */
+/*  Components                                                        */
 /* ------------------------------------------------------------------ */
 
 const MovieCard = ({
@@ -111,7 +104,9 @@ const MovieCard = ({
   onSelect,
   disabled,
   isWinner,
-  animationDelay = 0,
+  isLoser,
+  isSelected,
+  delay = 0,
 }: {
   movie: Movie;
   reveal: boolean;
@@ -119,661 +114,429 @@ const MovieCard = ({
   onSelect?: () => void;
   disabled?: boolean;
   isWinner?: boolean;
-  animationDelay?: number;
+  isLoser?: boolean;
+  isSelected?: boolean;
+  delay?: number;
 }) => {
   const title = movie.title ?? "Untitled";
   const posterUrl = getPosterUrl(movie);
   const [imageFailed, setImageFailed] = useState(false);
   const effectivePosterUrl = imageFailed ? null : posterUrl;
-  const sharedBody = (
-    <div className="relative aspect-[2/3] max-h-[calc(100dvh-11rem)] w-full bg-[#1a1a2e]">
-      {effectivePosterUrl ? (
-        <Image
-          src={effectivePosterUrl}
-          alt={title}
-          fill
-          sizes="(min-width: 1024px) 420px, (min-width: 640px) 45vw, 90vw"
-          className="object-contain"
-          onError={() => setImageFailed(true)}
-        />
-      ) : (
-        <div className="flex h-full w-full items-center justify-center bg-[linear-gradient(160deg,#1f2937,#43382c_55%,#b08957)] p-6 text-center">
-          <div className="space-y-3">
-            <div className="text-xs font-semibold uppercase tracking-[0.3em] text-white/60">
-              Poster unavailable
-            </div>
-            <div className="text-lg font-semibold leading-snug text-white">
-              {title}
-            </div>
+
+  return (
+    <button
+      type="button"
+      onClick={onSelect}
+      disabled={disabled}
+      className={`group relative w-full h-full overflow-hidden bg-zinc-900 transition-all duration-500 focus:outline-none ${
+        !reveal && !disabled ? "cursor-pointer hover:z-10" : "cursor-default"
+      }`}
+      style={{ animationDelay: `${delay}ms` }}
+    >
+      {/* Background Image */}
+      <div className={`absolute inset-0 transition-transform duration-700 ease-out ${!reveal && !disabled ? "group-hover:scale-105" : ""}`}>
+        {effectivePosterUrl ? (
+          <Image
+            src={effectivePosterUrl}
+            alt={title}
+            fill
+            sizes="(min-width: 1024px) 50vw, 100vw"
+            className={`object-cover transition-opacity duration-500 ${reveal && isLoser ? "opacity-30 grayscale" : "opacity-60 group-hover:opacity-80"}`}
+            onError={() => setImageFailed(true)}
+            priority
+          />
+        ) : (
+          <div className="absolute inset-0 flex items-center justify-center bg-zinc-800 text-zinc-600">
+            <span className="font-display text-2xl uppercase tracking-widest opacity-20">No Poster</span>
+          </div>
+        )}
+      </div>
+
+      {/* Gradient Overlay */}
+      <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent opacity-90" />
+
+      {/* Content */}
+      <div className="absolute inset-x-0 bottom-0 p-6 sm:p-10 flex flex-col items-start text-left z-20">
+        <span className="font-mono text-xs text-accent uppercase tracking-[0.2em] mb-2 opacity-80">
+          {label}
+        </span>
+        <h2 className="font-display text-3xl sm:text-4xl md:text-5xl lg:text-6xl leading-[0.9] text-white uppercase break-words w-full shadow-black drop-shadow-lg">
+          {title}
+        </h2>
+      </div>
+
+      {/* Reveal Overlay */}
+      {reveal && (
+        <div className="absolute inset-0 z-30 flex items-center justify-center animate-scale-in">
+          <div className="flex flex-col items-center justify-center p-6 text-center">
+             {/* Huge Stamp Feedback - Only on selected card */}
+             {isSelected && (isWinner ? (
+                <div className="font-display text-5xl sm:text-7xl text-success tracking-tighter uppercase -rotate-6 border-4 border-success px-4 py-2 opacity-90 drop-shadow-[0_0_15px_rgba(16,185,129,0.5)]">
+                  Correct
+                </div>
+             ) : isLoser ? (
+                <div className="font-display text-5xl sm:text-7xl text-error tracking-tighter uppercase rotate-6 border-4 border-error px-4 py-2 opacity-90 drop-shadow-[0_0_15px_rgba(244,63,94,0.5)]">
+                  Wrong
+                </div>
+             ) : null)}
+
+             {/* Rating Below - Secondary */}
+             <div className="mt-6 flex flex-col items-center">
+                <span className="font-mono text-xs uppercase tracking-widest text-zinc-400 mb-1">IMDb Rating</span>
+                <span className={`text-4xl font-display ${isWinner ? "text-white" : "text-zinc-500"}`}>
+                  {formatRating(movie.rating ?? null)}
+                </span>
+             </div>
           </div>
         </div>
       )}
-      <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent p-5 text-white">
-        <div className="text-[0.65rem] uppercase tracking-[0.35em] text-white/70">
-          {label}
-        </div>
-        <div className="mt-2 text-lg font-semibold leading-snug text-white">
-          {title}
-        </div>
-      </div>
-      {reveal ? (
-        <div
-          className={`absolute left-4 top-4 rounded-full px-3.5 py-1.5 text-sm font-bold shadow-lg transition-all ${
-            isWinner
-              ? "bg-[#c48a3b] text-white ring-2 ring-[#c48a3b]/30"
-              : "bg-white/80 text-slate-500"
-          }`}
-        >
-          <span className="flex items-center gap-1">
-            {isWinner && <StarIcon />}
-            {formatRating(movie.rating ?? null)}
-          </span>
-        </div>
-      ) : null}
-    </div>
-  );
-
-  if (onSelect) {
-    return (
-      <button
-        type="button"
-        onClick={onSelect}
-        disabled={disabled}
-        aria-label={`Select ${title}`}
-        style={{ animationDelay: `${animationDelay}ms` }}
-        className="animate-fade-slide-up relative flex w-full flex-col overflow-hidden rounded-3xl border border-black/10 bg-white/80 text-left shadow-[0_24px_50px_-30px_rgba(15,15,20,0.6)] transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-900/70 focus-visible:ring-offset-2 focus-visible:ring-offset-[#f6efe5] hover:-translate-y-1 disabled:cursor-not-allowed disabled:opacity-70"
-      >
-        {sharedBody}
-      </button>
-    );
-  }
-
-  return (
-    <div
-      style={{ animationDelay: `${animationDelay}ms` }}
-      className="animate-fade-slide-up relative flex w-full flex-col overflow-hidden rounded-3xl border border-black/10 bg-white/80 text-left shadow-[0_24px_50px_-30px_rgba(15,15,20,0.6)]"
-    >
-      {sharedBody}
-    </div>
+      
+      {/* Selection Highlight (Hover) */}
+      {!reveal && !disabled && (
+        <div className="absolute inset-0 border-4 border-transparent group-hover:border-accent/50 transition-colors duration-300 pointer-events-none" />
+      )}
+    </button>
   );
 };
 
 /* ------------------------------------------------------------------ */
-/*  ScoreCard (game-over screen)                                       */
-/* ------------------------------------------------------------------ */
-
-const defaultShareHost = () => {
-  const envUrl = process.env.NEXT_PUBLIC_SITE_URL;
-  if (envUrl) {
-    try {
-      return new URL(envUrl).host;
-    } catch {
-      // Ignore malformed env value.
-    }
-  }
-
-  return "cinescoreduel.com";
-};
-
-const ScoreCard = ({
-  score,
-  totalGuesses,
-  host,
-}: {
-  score: number;
-  totalGuesses: number;
-  host: string;
-}) => (
-  <div className="relative w-full max-w-3xl overflow-hidden rounded-3xl border border-black/10 bg-[linear-gradient(160deg,#1f2937,#43382c_55%,#b08957)] px-8 py-10 text-left text-white shadow-[0_32px_70px_-35px_rgba(15,15,20,0.7)] sm:px-12">
-    <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(0,0,0,0.05),rgba(0,0,0,0.55)_55%,rgba(0,0,0,0.85))]" />
-    <div className="relative space-y-4">
-      <p className="text-[0.65rem] font-semibold uppercase tracking-[0.35em] text-white/70">
-        {APP_NAME}
-      </p>
-      <p className="text-4xl font-semibold tracking-tight text-white sm:text-5xl">
-        {score} correct
-      </p>
-      <p className="text-xs uppercase tracking-[0.3em] text-white/70">
-        {totalGuesses} {totalGuesses === 1 ? "guess" : "guesses"} · {((score / totalGuesses) * 100).toFixed(0)}% accuracy
-      </p>
-      <p className="text-xs text-white/60">{host}</p>
-    </div>
-  </div>
-);
-
-/* ------------------------------------------------------------------ */
-/*  Main game component                                                */
+/*  Main Game                                                         */
 /* ------------------------------------------------------------------ */
 
 export default function MovieGame({ movies }: MovieGameProps) {
   const [state, dispatch] = useReducer(gameReducer, createInitialState());
-  const nextButtonRef = useRef<HTMLButtonElement | null>(null);
-  const shareButtonRef = useRef<HTMLButtonElement | null>(null);
+  const nextButtonRef = useRef<HTMLButtonElement>(null);
+  
+  // Share state
   const [shareUrl, setShareUrl] = useState<string | null>(null);
-  const [shareStatus, setShareStatus] = useState<
-    "idle" | "loading" | "copied" | "error"
-  >("idle");
-  const [shareError, setShareError] = useState<string | null>(null);
-  const [shareHost, setShareHost] = useState(defaultShareHost);
+  const [shareStatus, setShareStatus] = useState<"idle" | "loading" | "copied" | "error">("idle");
+  const [shareHost, setShareHost] = useState("");
 
-  /* Heart break animation tracking */
-  const prevLivesRef = useRef(state.livesRemaining);
-  const [breakingLifeIndex, setBreakingLifeIndex] = useState<number | null>(null);
+  const playableMovies = useMemo(() => movies.filter((m) => typeof m.rating === "number"), [movies]);
 
-  const playableMovies = useMemo(
-    () => movies.filter((movie) => typeof movie.rating === "number"),
-    [movies],
-  );
+  // Effects
+  useEffect(() => { setShareHost(window.location.host); }, []);
+  
+  useEffect(() => {
+    if (state.phase === "reveal") nextButtonRef.current?.focus();
+  }, [state.phase]);
 
-  const hasCachedPosters = useMemo(
-    () => movies.some((movie) => Boolean(movie.posterUrl)),
-    [movies],
-  );
+  useEffect(() => {
+     if (state.phase === "reveal") {
+       const lastRound = state.rounds[state.rounds.length - 1];
+       if (lastRound) trackEvent("guess", { guess: lastRound.guess, outcome: lastRound.outcome });
+     } else if (state.phase === "complete") {
+       trackEvent("session_complete", { score: state.score, totalGuesses: state.totalGuesses });
+     }
+  }, [state.phase, state.rounds, state.score, state.totalGuesses]);
 
-  /* Compute current streak from rounds history */
-  const currentStreak = useMemo(() => {
-    let streak = 0;
-    for (let i = state.rounds.length - 1; i >= 0; i--) {
-      if (state.rounds[i].outcome === "correct") {
-        streak++;
-      } else {
-        break;
-      }
-    }
-    return streak;
-  }, [state.rounds]);
-
+  // Handlers
   const handleStart = () => {
-    dispatch({
-      type: "start",
-      movies: playableMovies,
-      now: Date.now(),
-    });
+    dispatch({ type: "start", movies: playableMovies, now: Date.now() });
     trackEvent("session_start", {});
   };
 
-  const handleGuess = (guess: Guess) => {
-    dispatch({ type: "guess", guess });
-  };
-
-  const handleNext = () => {
-    dispatch({ type: "next", now: Date.now() });
-  };
-
-  const handleReset = () => {
-    dispatch({ type: "reset" });
-  };
-
-  const requestShareUrl = async () => {
-    const response = await fetch("/api/share", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        score: state.score,
-        totalGuesses: state.totalGuesses,
-      }),
-    });
-
-    if (!response.ok) {
-      throw new Error("Share request failed");
-    }
-
-    const data = (await response.json()) as {
-      shareUrl?: string;
-      sharePath?: string;
-    };
-    const url =
-      data.shareUrl ??
-      new URL(data.sharePath ?? "/", window.location.origin).toString();
-    setShareUrl(url);
-    return url;
-  };
+  const handleGuess = (guess: Guess) => dispatch({ type: "guess", guess });
+  const handleNext = () => dispatch({ type: "next", now: Date.now() });
+  const handleReset = () => dispatch({ type: "reset" });
 
   const ensureShareUrl = async () => {
-    if (shareUrl) {
-      return shareUrl;
+    if (shareUrl) return shareUrl;
+    try {
+      const res = await fetch("/api/share", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ score: state.score, totalGuesses: state.totalGuesses }),
+      });
+      if (!res.ok) throw new Error("Share failed");
+      const data = await res.json();
+      const url = data.shareUrl || new URL(data.sharePath || "/", window.location.origin).toString();
+      setShareUrl(url);
+      return url;
+    } catch {
+      return window.location.href;
     }
-
-    return requestShareUrl();
   };
 
   const handleShare = async () => {
-    setShareError(null);
     setShareStatus("loading");
-
     try {
       const url = await ensureShareUrl();
       const text = buildShareText(state.score, state.totalGuesses);
-      const intentUrl = buildTwitterIntentUrl({ text, url });
-      window.open(intentUrl, "_blank", "noopener,noreferrer");
-      trackEvent("share_intent", {
-        score: state.score,
-        totalGuesses: state.totalGuesses,
-      });
+      window.open(buildTwitterIntentUrl({ text, url }), "_blank");
       setShareStatus("idle");
     } catch {
-      setShareError("Unable to prepare share link.");
       setShareStatus("error");
-    } finally {
-      shareButtonRef.current?.focus();
     }
   };
 
   const handleCopyLink = async () => {
-    setShareError(null);
     setShareStatus("loading");
-
     try {
       const url = await ensureShareUrl();
-      if (navigator.clipboard?.writeText) {
-        await navigator.clipboard.writeText(url);
-      } else {
-        window.prompt("Copy this link", url);
-      }
-      trackEvent("share_copy", {
-        score: state.score,
-        totalGuesses: state.totalGuesses,
-      });
+      await navigator.clipboard.writeText(url);
       setShareStatus("copied");
+      setTimeout(() => setShareStatus("idle"), 2000);
     } catch {
-      setShareError("Unable to copy share link.");
       setShareStatus("error");
     }
   };
 
-  /* Keyboard: L/R during guess phase */
+  // Keyboard
   useEffect(() => {
-    if (state.phase !== "guess") {
-      return;
-    }
-
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (event.repeat) {
-        return;
-      }
-
-      if (event.key === "ArrowLeft" || event.key.toLowerCase() === "l") {
-        event.preventDefault();
-        dispatch({ type: "guess", guess: "left" });
-      }
-
-      if (event.key === "ArrowRight" || event.key.toLowerCase() === "r") {
-        event.preventDefault();
-        dispatch({ type: "guess", guess: "right" });
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.repeat) return;
+      if (state.phase === "guess") {
+        if (e.key === "ArrowLeft" || e.key.toLowerCase() === "l") handleGuess("left");
+        if (e.key === "ArrowRight" || e.key.toLowerCase() === "r") handleGuess("right");
+      } else if (state.phase === "reveal") {
+        if (e.key === "Enter" || e.key === " ") handleNext();
       }
     };
-
-    window.addEventListener("keydown", onKeyDown);
-    return () => window.removeEventListener("keydown", onKeyDown);
+    window.addEventListener("keydown", handleKey);
+    return () => window.removeEventListener("keydown", handleKey);
   }, [state.phase]);
-
-  /* Keyboard: Enter/Space during reveal phase */
-  useEffect(() => {
-    if (state.phase !== "reveal") {
-      return;
-    }
-
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (event.repeat) {
-        return;
-      }
-
-      if (event.key === "Enter" || event.key === " ") {
-        event.preventDefault();
-        dispatch({ type: "next", now: Date.now() });
-      }
-    };
-
-    window.addEventListener("keydown", onKeyDown);
-    return () => window.removeEventListener("keydown", onKeyDown);
-  }, [state.phase]);
-
-  useEffect(() => {
-    setShareHost(window.location.host);
-  }, []);
-
-  useEffect(() => {
-    if (shareStatus === "copied") {
-      const timer = window.setTimeout(() => {
-        setShareStatus("idle");
-      }, 2000);
-
-      return () => window.clearTimeout(timer);
-    }
-  }, [shareStatus]);
-
-  useEffect(() => {
-    if (state.phase !== "complete") {
-      setShareUrl(null);
-      setShareStatus("idle");
-      setShareError(null);
-    }
-  }, [state.phase]);
-
-  useEffect(() => {
-    if (state.phase === "reveal") {
-      nextButtonRef.current?.focus();
-    }
-  }, [state.phase]);
-
-  /* Heart break animation */
-  useEffect(() => {
-    if (state.livesRemaining < prevLivesRef.current) {
-      const lostIndex = state.livesRemaining;
-      setBreakingLifeIndex(lostIndex);
-      const timer = setTimeout(() => setBreakingLifeIndex(null), 600);
-      prevLivesRef.current = state.livesRemaining;
-      return () => clearTimeout(timer);
-    }
-    prevLivesRef.current = state.livesRemaining;
-  }, [state.livesRemaining]);
-
-  /* Reset heart tracking on game restart */
-  useEffect(() => {
-    if (state.phase === "landing") {
-      prevLivesRef.current = 3;
-      setBreakingLifeIndex(null);
-    }
-  }, [state.phase]);
-
-  useEffect(() => {
-    if (state.phase === "reveal") {
-      const lastRound = state.rounds[state.rounds.length - 1];
-      if (lastRound) {
-        trackEvent("guess", {
-          guess: lastRound.guess,
-          outcome: lastRound.outcome,
-        });
-      }
-    }
-
-    if (state.phase === "complete") {
-      trackEvent("session_complete", {
-        score: state.score,
-        totalGuesses: state.totalGuesses,
-        durationSeconds:
-          state.startedAt && state.completedAt
-            ? Math.round((state.completedAt - state.startedAt) / 1000)
-            : 0,
-      });
-    }
-  }, [
-    state.phase,
-    state.rounds,
-    state.score,
-    state.totalGuesses,
-    state.startedAt,
-    state.completedAt,
-  ]);
 
   /* ---------------------------------------------------------------- */
-  /*  Landing screen                                                   */
+  /*  Views                                                           */
   /* ---------------------------------------------------------------- */
 
+  // Landing View
   if (state.phase === "landing") {
     return (
-      <section className="mx-auto flex w-full max-w-5xl flex-col items-center gap-10 px-6 py-16 text-center">
-        <div className="inline-flex items-center gap-2 rounded-full border border-black/10 bg-white/80 px-4 py-2 text-[0.65rem] font-semibold uppercase tracking-[0.3em] text-slate-700">
-          IMDb Top 250 Duel
-        </div>
-        <div className="max-w-2xl space-y-4">
-          <h1 className="text-4xl font-semibold tracking-tight text-slate-900 sm:text-5xl">
-            Choose the higher rating. Three lives. Keep playing.
+      <main className="min-h-screen flex flex-col items-center justify-center p-6 text-center relative overflow-hidden">
+        {/* Decorative Background */}
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-zinc-900 via-black to-black -z-10" />
+        
+        <div className="space-y-8 max-w-2xl relative z-10 animate-fade-in">
+          <div className="inline-block px-4 py-1.5 border border-white/10 rounded-full bg-white/5 backdrop-blur-sm">
+             <span className="text-xs font-mono text-accent uppercase tracking-[0.3em]">CineScore Duel</span>
+          </div>
+          
+          <h1 className="font-display text-7xl sm:text-9xl leading-[0.8] tracking-tighter text-transparent bg-clip-text bg-gradient-to-b from-white to-white/50">
+            HIGHER<br/>RATING
           </h1>
-          <p className="text-base leading-relaxed text-slate-600 sm:text-lg">
-            Two movie posters enter. One rating reigns. Tap the movie you think
-            is higher. Wrong guess costs a life. Play until you run out.
+          
+          <p className="font-sans text-lg text-zinc-400 max-w-md mx-auto leading-relaxed">
+            Two movies. One choice. Guess the higher IMDb rating. <span className="text-white">Three strikes and you're out.</span>
           </p>
+
+          <div className="pt-8">
+            <button
+              onClick={handleStart}
+              className="group relative inline-flex items-center justify-center px-10 py-5 font-display text-2xl uppercase tracking-widest text-black bg-accent hover:bg-yellow-400 transition-all duration-300 clip-path-button"
+            >
+              <span className="relative z-10">Start Game</span>
+              <div className="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity" />
+            </button>
+          </div>
         </div>
-        <button
-          type="button"
-          onClick={handleStart}
-          className="rounded-full bg-[#c48a3b] px-8 py-3 text-sm font-semibold uppercase tracking-[0.25em] text-white shadow-lg shadow-amber-500/30 transition hover:-translate-y-0.5 hover:bg-[#b47931]"
-        >
-          Start game
-        </button>
-        {!hasCachedPosters ? (
-          <p className="max-w-lg rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-xs font-semibold uppercase tracking-[0.2em] text-amber-900">
-            Cached posters missing. Run TMDB ingest with cache enabled.
-          </p>
-        ) : null}
-        <div className="flex flex-wrap items-center justify-center gap-6 text-xs uppercase tracking-[0.3em] text-slate-500">
-          <span>Untimed gameplay</span>
-          <span>3 lives to start</span>
-          <span>Results recap</span>
+
+        <div className="absolute bottom-8 text-xs font-mono text-zinc-600 uppercase tracking-widest">
+           Press Start to Enter The Arena
         </div>
-        {state.error ? (
-          <p className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-            {state.error}
-          </p>
-        ) : null}
-      </section>
+      </main>
     );
   }
 
-  /* ---------------------------------------------------------------- */
-  /*  Complete screen                                                  */
-  /* ---------------------------------------------------------------- */
-
+  // Complete View
   if (state.phase === "complete") {
-    const sessionLength = formatDuration(state.startedAt, state.completedAt);
-    const shareDisabled = shareStatus === "loading";
-    const shareLabel = shareDisabled ? "Preparing..." : "Share on X";
-    const copyLabel = shareStatus === "copied" ? "Link copied" : "Copy link";
+    return (
+      <main className="min-h-screen flex items-center justify-center p-4 sm:p-6 bg-zinc-950 relative overflow-hidden">
+        <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20" />
+        
+        {/* Ticket Wrapper */}
+        <div className="relative w-full max-w-3xl animate-scale-in drop-shadow-[0_25px_50px_rgba(56,189,248,0.25)]">
+          
+          {/* Main Ticket Container with Classic Shape */}
+          <div className="ticket-classic w-full min-h-[320px] sm:min-h-[380px] p-6 flex relative">
+            
+            {/* The dashed line divider */}
+            <div className="ticket-dashed-line" />
+
+            {/* STUB (Left Side) */}
+            <div className="w-[28%] pr-4 flex flex-col items-center justify-center border-r border-sky-900/20 relative z-10">
+               {/* Vertical "ADMIT ONE" */}
+               <div className="vertical-text font-display text-5xl sm:text-7xl text-sky-950/40 tracking-widest leading-none whitespace-nowrap opacity-60 mix-blend-multiply select-none">
+                 ADMIT ONE
+               </div>
+               
+               {/* Barcode */}
+               <div className="absolute left-4 sm:left-6 top-1/2 -translate-y-1/2 h-[70%] w-4 sm:w-6 bg-[repeating-linear-gradient(0deg,#000,#000_2px,transparent_2px,transparent_5px)] opacity-40 mix-blend-multiply" />
+            </div>
+
+            {/* BODY (Right Side) */}
+            <div className="flex-1 pl-8 flex flex-col relative z-10">
+               {/* Inner Cream Card - now lighter/cooler cream or keep warm contrast */}
+               <div className="ticket-cream-bg w-full h-full rounded-lg border border-sky-900/10 p-4 sm:p-6 flex flex-col items-center text-center relative shadow-inner">
+                  
+                  {/* Corner Decorations */}
+                  <div className="absolute top-2 left-2 w-6 h-6 border-t border-l border-sky-900/20 rounded-tl-xl" />
+                  <div className="absolute top-2 right-2 w-6 h-6 border-t border-r border-sky-900/20 rounded-tr-xl" />
+                  <div className="absolute bottom-2 left-2 w-6 h-6 border-b border-l border-sky-900/20 rounded-bl-xl" />
+                  <div className="absolute bottom-2 right-2 w-6 h-6 border-b border-r border-sky-900/20 rounded-br-xl" />
+
+                  {/* Header */}
+                  <h1 className="font-display text-3xl sm:text-5xl text-sky-900 uppercase tracking-widest mb-1 opacity-90">
+                    CineScore Duel
+                  </h1>
+                  <div className="font-mono text-[10px] text-sky-900/50 uppercase tracking-[0.4em] mb-6">
+                    {new Date().toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+                  </div>
+
+                  {/* Score */}
+                  <div className="flex-1 flex items-center justify-center gap-6 sm:gap-12 w-full my-2">
+                     <div className="hidden sm:block text-sky-400/60">
+                       <StarIcon />
+                     </div>
+                     
+                     <div className="flex flex-col items-center">
+                        <span className="font-display text-8xl sm:text-9xl text-sky-600 leading-[0.85] tracking-tighter drop-shadow-sm">
+                          {state.score}
+                        </span>
+                        <div className="px-3 py-1 bg-sky-900/5 rounded-full mt-2">
+                           <span className="font-mono text-xs text-sky-800 uppercase tracking-widest font-bold">
+                             Correct Guesses
+                           </span>
+                        </div>
+                     </div>
+                     
+                     <div className="hidden sm:block text-sky-400/60">
+                       <StarIcon />
+                     </div>
+                  </div>
+
+                  {/* Footer Stats & Actions */}
+                  <div className="w-full grid grid-cols-3 items-end mt-4 pt-4 border-t border-sky-900/10">
+                     <div className="text-left">
+                       <div className="font-display text-2xl text-sky-900">{state.totalGuesses}</div>
+                       <div className="font-mono text-[9px] text-sky-900/50 uppercase tracking-wider">Rounds</div>
+                     </div>
+                     
+                     <div className="flex justify-center gap-3">
+                        <button 
+                          onClick={handleShare}
+                          className="px-6 py-2 bg-sky-600 text-white font-bold font-mono text-[10px] sm:text-xs uppercase tracking-widest hover:bg-sky-700 transition-colors rounded shadow-sm hover:shadow-md transform hover:-translate-y-0.5 active:translate-y-0"
+                        >
+                          {shareStatus === "loading" ? "..." : "SHARE"}
+                        </button>
+                        <button 
+                          onClick={handleReset}
+                          className="px-6 py-2 border border-sky-400 text-sky-700 font-bold font-mono text-[10px] sm:text-xs uppercase tracking-widest hover:bg-sky-100 transition-colors rounded hover:shadow-sm transform hover:-translate-y-0.5 active:translate-y-0"
+                        >
+                          REPLAY
+                        </button>
+                     </div>
+
+                     <div className="text-right">
+                       <div className="font-display text-2xl text-sky-900">{((state.score / state.totalGuesses) * 100).toFixed(0)}%</div>
+                       <div className="font-mono text-[9px] text-sky-900/50 uppercase tracking-wider">Accuracy</div>
+                     </div>
+                  </div>
+
+               </div>
+            </div>
+
+          </div>
+        </div>
+      </main>
+    );
+  }
+
+  // Game View
+  const activeRound = state.activeRound;
+  
+  if (activeRound) {
+    const isReveal = state.phase === "reveal";
+    const leftRating = activeRound.left.rating ?? 0;
+    const rightRating = activeRound.right.rating ?? 0;
+    const leftWin = leftRating >= rightRating;
 
     return (
-      <section className="mx-auto flex w-full max-w-4xl flex-col items-center gap-8 px-6 py-16 text-center">
-        <div className="inline-flex items-center gap-2 rounded-full border border-black/10 bg-white/80 px-4 py-2 text-[0.65rem] font-semibold uppercase tracking-[0.3em] text-slate-700">
-          Session complete
+      <main className="h-screen w-full flex flex-col relative bg-zinc-950 overflow-hidden">
+        {/* Ambient Background Spotlights */}
+        <div className="absolute top-1/2 left-1/4 w-[500px] h-[500px] bg-indigo-900/20 rounded-full blur-[128px] pointer-events-none -translate-y-1/2" />
+        <div className="absolute top-1/2 right-1/4 w-[500px] h-[500px] bg-purple-900/20 rounded-full blur-[128px] pointer-events-none -translate-y-1/2" />
+
+        {/* HUD - Marquee Bar */}
+        <header className="flex-none z-50 flex justify-between items-center px-6 py-4 border-b border-white/5 bg-black/40 backdrop-blur-md">
+          <div className="flex items-center gap-2">
+            {[...Array(3)].map((_, i) => (
+              <HeartIcon key={i} filled={i < state.livesRemaining} breaking={i === state.livesRemaining} />
+            ))}
+          </div>
+          <div className="flex flex-col items-end">
+            <span className="font-mono text-[10px] text-zinc-500 uppercase tracking-widest">Score</span>
+            <span className="font-display text-3xl leading-none text-white text-glow">{state.score}</span>
+          </div>
+        </header>
+
+        {/* Game Stage Area */}
+        <div className="flex-1 relative flex items-center justify-center p-4 sm:p-8">
+           <div className="w-full max-w-6xl h-full flex flex-col lg:flex-row gap-4 lg:gap-12 items-center justify-center">
+             
+             {/* Left Poster */}
+             <div className="relative w-full lg:w-[400px] aspect-[2/3] max-h-[40vh] lg:max-h-[70vh] flex-shrink-0 perspective-1000">
+                <MovieCard
+                  movie={activeRound.left}
+                  reveal={isReveal}
+                  label="Challenger 01"
+                  onSelect={() => handleGuess("left")}
+                  disabled={isReveal}
+                  isWinner={leftWin}
+                  isLoser={!leftWin}
+                  isSelected={activeRound.guess === 'left'}
+                />
+             </div>
+
+             {/* Center VS Badge */}
+             <div className="relative z-40 flex flex-col items-center justify-center gap-4 flex-shrink-0 h-16 lg:h-auto">
+                <div className="relative flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 bg-black border border-zinc-700 rounded-full shadow-[0_0_20px_rgba(255,255,255,0.1)]">
+                  <span className="font-display text-xl text-white italic pr-1">VS</span>
+                </div>
+                
+                {isReveal && (
+                  <div className={`whitespace-nowrap px-4 py-1.5 bg-black border border-white/10 rounded-full animate-scale-in ${activeRound.outcome === 'correct' ? 'text-success border-success/30' : 'text-error border-error/30'}`}>
+                    <span className="font-mono text-xs uppercase tracking-widest font-bold">
+                      {activeRound.outcome === 'correct' ? 'Correct' : 'Wrong'}
+                    </span>
+                  </div>
+                )}
+             </div>
+
+             {/* Right Poster */}
+             <div className="relative w-full lg:w-[400px] aspect-[2/3] max-h-[40vh] lg:max-h-[70vh] flex-shrink-0 perspective-1000">
+                <MovieCard
+                  movie={activeRound.right}
+                  reveal={isReveal}
+                  label="Challenger 02"
+                  onSelect={() => handleGuess("right")}
+                  disabled={isReveal}
+                  isWinner={!leftWin}
+                  isLoser={leftWin}
+                  isSelected={activeRound.guess === 'right'}
+                  delay={100}
+                />
+             </div>
+
+           </div>
         </div>
-        <ScoreCard
-          score={state.score}
-          totalGuesses={state.totalGuesses}
-          host={shareHost}
-        />
-        <div className="flex flex-wrap items-center justify-center gap-3">
-          <button
-            type="button"
-            onClick={handleShare}
-            disabled={shareDisabled}
-            ref={shareButtonRef}
-            className="rounded-full bg-slate-900 px-6 py-3 text-xs font-semibold uppercase tracking-[0.3em] text-white shadow transition hover:-translate-y-0.5 hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-70"
-          >
-            {shareLabel}
-          </button>
-          <button
-            type="button"
-            onClick={handleCopyLink}
-            disabled={shareDisabled}
-            className="rounded-full border border-black/10 bg-white/80 px-6 py-3 text-xs font-semibold uppercase tracking-[0.3em] text-slate-700 disabled:cursor-not-allowed disabled:opacity-70"
-          >
-            {copyLabel}
-          </button>
-          <button
-            type="button"
-            onClick={handleReset}
-            className="rounded-full border border-black/10 bg-white/80 px-6 py-3 text-xs font-semibold uppercase tracking-[0.3em] text-slate-700"
-          >
-            Play again
-          </button>
-        </div>
-        <p className="text-xs uppercase tracking-[0.35em] text-slate-500">
-          Elapsed time · {sessionLength}
-        </p>
-        {shareStatus === "loading" ? (
-          <p aria-live="polite" className="text-xs uppercase tracking-[0.3em] text-slate-500">
-            Preparing share link
-          </p>
-        ) : null}
-        {shareStatus === "copied" ? (
-          <p aria-live="polite" className="text-xs uppercase tracking-[0.3em] text-emerald-600">
-            Link copied to clipboard
-          </p>
-        ) : null}
-        {shareError ? (
-          <p role="alert" className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
-            {shareError}
-          </p>
-        ) : null}
-        {state.error ? (
-          <p className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
-            {state.error}
-          </p>
-        ) : null}
-      </section>
+
+        {/* Next Button Overlay (Floating Bottom) */}
+        {isReveal && (
+          <div className="absolute bottom-8 left-0 right-0 z-50 flex justify-center animate-slide-up pointer-events-none">
+            <button
+              ref={nextButtonRef}
+              onClick={handleNext}
+              className="pointer-events-auto px-10 py-4 bg-white text-black font-display text-xl uppercase tracking-widest hover:bg-accent hover:text-black transition-colors shadow-[0_10px_40px_rgba(0,0,0,0.5)] clip-path-slant"
+            >
+              Next Round <span className="opacity-50 text-sm ml-2">↵</span>
+            </button>
+          </div>
+        )}
+      </main>
     );
   }
 
-  /* ---------------------------------------------------------------- */
-  /*  Active game (guess / reveal)                                     */
-  /* ---------------------------------------------------------------- */
-
-  const activeRound = state.activeRound;
-
-  if (!activeRound) {
-    return null;
-  }
-
-  const reveal = state.phase === "reveal";
-  const outcome = activeRound.outcome;
-  const leftRating = activeRound.left.rating ?? 0;
-  const rightRating = activeRound.right.rating ?? 0;
-  const higherSide = leftRating >= rightRating ? "left" : "right";
-  const roundKey = `${activeRound.left.id}-${activeRound.right.id}`;
-
-  return (
-    <section className="mx-auto flex h-[100dvh] w-full max-w-6xl flex-col px-6 py-4">
-      {/* ---- Header ---- */}
-      <header className="film-strip-border flex flex-shrink-0 flex-wrap items-center justify-between gap-4 rounded-3xl border border-black/10 bg-white/80 px-6 py-4">
-        <div className="flex items-center gap-5">
-          {/* Hearts */}
-          <div
-            className="flex items-center gap-1.5"
-            aria-label={`${state.livesRemaining} lives remaining`}
-          >
-            {Array.from({ length: 3 }, (_, i) => (
-              <HeartIcon
-                key={i}
-                filled={i < state.livesRemaining}
-                breaking={i === breakingLifeIndex}
-              />
-            ))}
-          </div>
-          {/* Divider */}
-          <div className="h-8 w-px bg-slate-200" />
-          {/* Score */}
-          <div>
-            <p className="text-[0.6rem] uppercase tracking-[0.35em] text-slate-400">
-              Score
-            </p>
-            <p className="text-2xl font-semibold text-slate-900">
-              {state.score}
-            </p>
-          </div>
-          {/* Streak */}
-          {currentStreak >= 2 && (
-            <div className="animate-pulse-gold flex items-center gap-1.5 rounded-full bg-amber-500/15 px-3 py-1 text-xs font-bold uppercase tracking-[0.2em] text-amber-700">
-              <FlameIcon />
-              {currentStreak}x
-            </div>
-          )}
-        </div>
-        <div className="rounded-full bg-slate-900 px-4 py-2 text-xs font-semibold uppercase tracking-[0.25em] text-white">
-          Pick the higher rating
-        </div>
-      </header>
-
-      {/* ---- Card grid (flexible middle) ---- */}
-      <div className="mt-4 flex min-h-0 flex-1 items-center">
-        <div
-          key={roundKey}
-          className="grid w-full gap-4 lg:grid-cols-[1fr_auto_1fr]"
-        >
-          <MovieCard
-            movie={activeRound.left}
-            reveal={reveal}
-            label="Left"
-            onSelect={reveal ? undefined : () => handleGuess("left")}
-            disabled={reveal}
-            isWinner={reveal && higherSide === "left"}
-            animationDelay={0}
-          />
-
-          {/* VS divider */}
-          <div className="flex items-center justify-center gap-4 lg:flex-col">
-            {/* Horizontal lines on mobile */}
-            <div className="h-px flex-1 bg-slate-300 lg:hidden" />
-
-            <div className="flex flex-col items-center gap-3">
-              <div
-                className="flex h-12 w-12 items-center justify-center rounded-full border-2 border-slate-300 bg-white/90 shadow-sm"
-                style={{ fontFamily: "var(--font-title)" }}
-              >
-                <span className="text-sm font-bold tracking-wide text-slate-700">
-                  VS
-                </span>
-              </div>
-
-              {reveal ? (
-                <span
-                  aria-live="polite"
-                  className={`flex items-center gap-1.5 rounded-full px-5 py-2.5 text-sm font-bold uppercase tracking-[0.2em] shadow-sm ${
-                    outcome === "correct"
-                      ? "bg-emerald-500 text-white"
-                      : "bg-rose-500 text-white animate-wrong-shake"
-                  }`}
-                >
-                  {outcome === "correct" ? <CheckIcon /> : <XIcon />}
-                  {outcome === "correct" ? "Correct" : "Wrong"}
-                </span>
-              ) : (
-                <span className="rounded-full bg-white/80 px-5 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-slate-700">
-                  Make your call
-                </span>
-              )}
-            </div>
-
-            {/* Horizontal lines on mobile */}
-            <div className="h-px flex-1 bg-slate-300 lg:hidden" />
-          </div>
-
-          <MovieCard
-            movie={activeRound.right}
-            reveal={reveal}
-            label="Right"
-            onSelect={reveal ? undefined : () => handleGuess("right")}
-            disabled={reveal}
-            isWinner={reveal && higherSide === "right"}
-            animationDelay={100}
-          />
-        </div>
-      </div>
-
-      {/* ---- Bottom action bar (always visible) ---- */}
-      <div className="flex flex-shrink-0 flex-wrap items-center justify-center gap-4 pb-2 pt-4">
-        {reveal ? (
-          <button
-            type="button"
-            onClick={handleNext}
-            ref={nextButtonRef}
-            className="rounded-full bg-slate-900 px-6 py-3 text-xs font-semibold uppercase tracking-[0.3em] text-white transition hover:-translate-y-0.5 hover:bg-slate-800"
-          >
-            Next
-            <span className="ml-2 hidden text-[0.6rem] text-white/50 sm:inline">
-              [Enter]
-            </span>
-          </button>
-        ) : (
-          <p className="rounded-full border border-black/10 bg-white/80 px-5 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-slate-600">
-            Tap the movie you think is higher
-            <span className="ml-3 hidden text-slate-400 sm:inline">
-              [L] / [R]
-            </span>
-          </p>
-        )}
-      </div>
-    </section>
-  );
+  return null;
 }
