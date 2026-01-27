@@ -1,0 +1,126 @@
+@import "tailwindcss";
+
+:root {
+  --background: #f6efe5;
+  --foreground: #1c1f2a;
+  --accent: #c48a3b;
+  --accent-strong: #a96d24;
+  --card: rgba(255, 255, 255, 0.78);
+  --card-border: rgba(15, 23, 42, 0.12);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-accent: var(--accent);
+  --color-card: var(--card);
+  --color-card-border: var(--card-border);
+  --font-sans: var(--font-body);
+  --animate-fade-slide-up: fadeSlideUp 0.4s ease-out both;
+  --animate-heart-break: heartBreak 0.5s ease-out both;
+  --animate-wrong-shake: wrongShake 0.4s ease-out;
+  --animate-pulse-gold: pulseGold 1.5s ease-in-out infinite;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-body);
+  min-height: 100vh;
+}
+
+/* Film grain overlay */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  pointer-events: none;
+  opacity: 0.04;
+  background: repeating-conic-gradient(#000 0% 25%, transparent 0% 50%) 0 0 / 4px 4px;
+  mix-blend-mode: overlay;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-title);
+}
+
+/* Keyframes */
+@keyframes fadeSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes heartBreak {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  30% {
+    transform: scale(1.25);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(0.85);
+    opacity: 0.35;
+  }
+}
+
+@keyframes wrongShake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  20% {
+    transform: translateX(-3px);
+  }
+  40% {
+    transform: translateX(3px);
+  }
+  60% {
+    transform: translateX(-2px);
+  }
+  80% {
+    transform: translateX(2px);
+  }
+}
+
+@keyframes pulseGold {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.08);
+  }
+}
+
+/* Film strip perforation border */
+.film-strip-border {
+  position: relative;
+}
+.film-strip-border::after {
+  content: "";
+  position: absolute;
+  bottom: -3px;
+  left: 24px;
+  right: 24px;
+  height: 3px;
+  background: repeating-linear-gradient(
+    90deg,
+    var(--accent) 0px,
+    var(--accent) 8px,
+    transparent 8px,
+    transparent 14px
+  );
+  border-radius: 2px;
+  opacity: 0.3;
+}
