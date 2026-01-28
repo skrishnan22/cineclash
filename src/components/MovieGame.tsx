@@ -543,7 +543,7 @@ export default function MovieGame({ movies }: MovieGameProps) {
       }
 
       setShareStatus("idle");
-      setFeedback("Image copied");
+      setFeedback("Image copied to clipboard");
       trackEvent("share_success", { method: "copy_image" });
     } catch {
       setShareStatus("error");
@@ -653,12 +653,12 @@ export default function MovieGame({ movies }: MovieGameProps) {
         <div className="relative w-full max-w-3xl animate-scale-in">
           <div className="drop-shadow-[0_25px_50px_rgba(56,189,248,0.25)]">
             {/* Main Ticket Container with Classic Shape */}
-            <div className="ticket-classic w-full min-h-[320px] sm:min-h-[380px] p-6 flex relative">
-              {/* The dashed line divider */}
-              <div className="ticket-dashed-line" />
+            <div className="ticket-classic w-full min-h-[280px] sm:min-h-[380px] p-4 sm:p-6 flex relative">
+              {/* The dashed line divider - hidden on mobile */}
+              <div className="ticket-dashed-line hidden sm:block" />
 
-              {/* STUB (Left Side) */}
-              <div className="w-[28%] pr-4 flex flex-col items-center justify-center border-r border-sky-900/20 relative z-10">
+              {/* STUB (Left Side) - Hidden on mobile */}
+              <div className="hidden sm:flex w-[28%] pr-4 flex-col items-center justify-center border-r border-sky-900/20 relative z-10">
                 {/* Vertical "ADMIT ONE" */}
                 <div className="vertical-text font-display text-5xl sm:text-7xl text-sky-950/40 tracking-widest leading-none whitespace-nowrap opacity-60 mix-blend-multiply select-none">
                   ADMIT ONE
@@ -668,21 +668,21 @@ export default function MovieGame({ movies }: MovieGameProps) {
                 <div className="absolute left-4 sm:left-6 top-1/2 -translate-y-1/2 h-[70%] w-4 sm:w-6 bg-[repeating-linear-gradient(0deg,#000,#000_2px,transparent_2px,transparent_5px)] opacity-40 mix-blend-multiply" />
               </div>
 
-              {/* BODY (Right Side) */}
-              <div className="flex-1 pl-8 flex flex-col relative z-10">
-                {/* Inner Cream Card - now lighter/cooler cream or keep warm contrast */}
+              {/* BODY (Right Side on desktop, Full width on mobile) */}
+              <div className="flex-1 sm:pl-8 flex flex-col relative z-10">
+                {/* Inner Cream Card */}
                 <div className="ticket-cream-bg w-full h-full rounded-lg border border-sky-900/10 p-4 sm:p-6 flex flex-col items-center text-center relative shadow-inner">
                   {/* Corner Decorations */}
-                  <div className="absolute top-2 left-2 w-6 h-6 border-t border-l border-sky-900/20 rounded-tl-xl" />
-                  <div className="absolute top-2 right-2 w-6 h-6 border-t border-r border-sky-900/20 rounded-tr-xl" />
-                  <div className="absolute bottom-2 left-2 w-6 h-6 border-b border-l border-sky-900/20 rounded-bl-xl" />
-                  <div className="absolute bottom-2 right-2 w-6 h-6 border-b border-r border-sky-900/20 rounded-br-xl" />
+                  <div className="absolute top-2 left-2 w-4 sm:w-6 h-4 sm:h-6 border-t border-l border-sky-900/20 rounded-tl-xl" />
+                  <div className="absolute top-2 right-2 w-4 sm:w-6 h-4 sm:h-6 border-t border-r border-sky-900/20 rounded-tr-xl" />
+                  <div className="absolute bottom-2 left-2 w-4 sm:w-6 h-4 sm:h-6 border-b border-l border-sky-900/20 rounded-bl-xl" />
+                  <div className="absolute bottom-2 right-2 w-4 sm:w-6 h-4 sm:h-6 border-b border-r border-sky-900/20 rounded-br-xl" />
 
                   {/* Header */}
-                  <h1 className="font-display text-3xl sm:text-5xl text-sky-900 uppercase tracking-widest mb-1 opacity-90">
+                  <h1 className="font-display text-2xl sm:text-5xl text-sky-900 uppercase tracking-widest mb-1 opacity-90">
                     CineClash
                   </h1>
-                  <div className="font-mono text-[10px] text-sky-900/50 uppercase tracking-[0.4em] mb-6">
+                  <div className="font-mono text-[8px] sm:text-[10px] text-sky-900/50 uppercase tracking-[0.3em] sm:tracking-[0.4em] mb-4 sm:mb-6">
                     {new Date().toLocaleDateString(undefined, {
                       weekday: "long",
                       year: "numeric",
@@ -698,11 +698,11 @@ export default function MovieGame({ movies }: MovieGameProps) {
                     </div>
 
                     <div className="flex flex-col items-center">
-                      <span className="font-display text-8xl sm:text-9xl text-sky-600 leading-[0.85] tracking-normal drop-shadow-sm">
+                      <span className="font-display text-7xl sm:text-9xl text-sky-600 leading-[0.85] tracking-normal drop-shadow-sm">
                         {state.score}
                       </span>
-                      <div className="px-3 py-1 bg-sky-900/5 rounded-full mt-2">
-                        <span className="font-mono text-xs text-sky-800 uppercase tracking-widest font-bold">
+                      <div className="px-2 sm:px-3 py-1 bg-sky-900/5 rounded-full mt-2">
+                        <span className="font-mono text-[10px] sm:text-xs text-sky-800 uppercase tracking-wider sm:tracking-widest font-bold">
                           Correct Guesses
                         </span>
                       </div>
@@ -714,21 +714,21 @@ export default function MovieGame({ movies }: MovieGameProps) {
                   </div>
 
                   {/* Footer Stats */}
-                  <div className="w-full grid grid-cols-2 items-end mt-4 pt-4 border-t border-sky-900/10">
+                  <div className="w-full grid grid-cols-2 items-end mt-3 sm:mt-4 pt-3 sm:pt-4 border-t border-sky-900/10">
                     <div className="text-left">
-                      <div className="font-display text-2xl text-sky-900">
+                      <div className="font-display text-xl sm:text-2xl text-sky-900">
                         {state.totalGuesses}
                       </div>
-                      <div className="font-mono text-[9px] text-sky-900/50 uppercase tracking-wider">
+                      <div className="font-mono text-[8px] sm:text-[9px] text-sky-900/50 uppercase tracking-wider">
                         Rounds
                       </div>
                     </div>
 
                     <div className="text-right">
-                      <div className="font-display text-2xl text-sky-900">
+                      <div className="font-display text-xl sm:text-2xl text-sky-900">
                         {((state.score / state.totalGuesses) * 100).toFixed(0)}%
                       </div>
-                      <div className="font-mono text-[9px] text-sky-900/50 uppercase tracking-wider">
+                      <div className="font-mono text-[8px] sm:text-[9px] text-sky-900/50 uppercase tracking-wider">
                         Accuracy
                       </div>
                     </div>
@@ -758,8 +758,10 @@ export default function MovieGame({ movies }: MovieGameProps) {
             </div>
             {shareFeedback && (
               <div
-                className={`text-[10px] font-mono uppercase tracking-widest ${
-                  shareStatus === "error" ? "text-red-500" : "text-sky-900/50"
+                className={`text-[10px] sm:text-[11px] font-mono uppercase tracking-[0.2em] px-3 py-1.5 rounded-full border ${
+                  shareStatus === "error"
+                    ? "text-rose-700 border-rose-200 bg-rose-50"
+                    : "text-sky-900 border-sky-200 bg-sky-50"
                 }`}
                 aria-live="polite"
               >
@@ -809,10 +811,10 @@ export default function MovieGame({ movies }: MovieGameProps) {
         </header>
 
         {/* Game Stage Area */}
-        <div className="flex-1 relative flex items-center justify-center p-4 sm:p-8">
-          <div className="w-full max-w-6xl h-full flex flex-col lg:flex-row gap-4 lg:gap-12 items-center justify-center">
+        <div className="flex-1 relative flex items-center justify-center p-2 sm:p-4 lg:p-8 overflow-hidden">
+          <div className="w-full max-w-6xl h-full flex flex-col lg:flex-row gap-2 sm:gap-4 lg:gap-12 items-center justify-center">
             {/* Left Poster */}
-            <div className="relative w-full lg:w-[400px] aspect-[2/3] max-h-[40vh] lg:max-h-[70vh] flex-shrink-0 perspective-1000">
+            <div className="relative w-full lg:w-[400px] aspect-[2/3] max-h-[calc(42vh-60px)] sm:max-h-[38vh] lg:max-h-[70vh] flex-shrink-0 perspective-1000">
               <MovieCard
                 movie={activeRound.left}
                 reveal={isReveal}
@@ -826,18 +828,18 @@ export default function MovieGame({ movies }: MovieGameProps) {
             </div>
 
             {/* Center VS Badge */}
-            <div className="relative z-40 flex flex-col items-center justify-center gap-4 flex-shrink-0 h-16 lg:h-auto">
-              <div className="relative flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 bg-black border border-zinc-700 rounded-full shadow-[0_0_20px_rgba(255,255,255,0.1)]">
-                <span className="font-display text-xl text-white italic pr-1">
+            <div className="relative z-40 flex flex-col items-center justify-center gap-2 sm:gap-4 flex-shrink-0 py-1 sm:py-0 lg:h-auto">
+              <div className="relative flex items-center justify-center w-10 h-10 sm:w-16 sm:h-16 bg-black border border-zinc-700 rounded-full shadow-[0_0_20px_rgba(255,255,255,0.1)]">
+                <span className="font-display text-lg sm:text-xl text-white italic pr-1">
                   VS
                 </span>
               </div>
 
               {isReveal && (
                 <div
-                  className={`whitespace-nowrap px-4 py-1.5 bg-black border border-white/10 rounded-full animate-scale-in ${activeRound.outcome === "correct" ? "text-success border-success/30" : "text-error border-error/30"}`}
+                  className={`whitespace-nowrap px-3 sm:px-4 py-1 sm:py-1.5 bg-black border border-white/10 rounded-full animate-scale-in ${activeRound.outcome === "correct" ? "text-success border-success/30" : "text-error border-error/30"}`}
                 >
-                  <span className="font-mono text-xs uppercase tracking-widest font-bold">
+                  <span className="font-mono text-[10px] sm:text-xs uppercase tracking-widest font-bold">
                     {activeRound.outcome === "correct" ? "Correct" : "Wrong"}
                   </span>
                 </div>
@@ -845,7 +847,7 @@ export default function MovieGame({ movies }: MovieGameProps) {
             </div>
 
             {/* Right Poster */}
-            <div className="relative w-full lg:w-[400px] aspect-[2/3] max-h-[40vh] lg:max-h-[70vh] flex-shrink-0 perspective-1000">
+            <div className="relative w-full lg:w-[400px] aspect-[2/3] max-h-[calc(42vh-60px)] sm:max-h-[38vh] lg:max-h-[70vh] flex-shrink-0 perspective-1000">
               <MovieCard
                 movie={activeRound.right}
                 reveal={isReveal}
