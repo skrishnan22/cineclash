@@ -31,7 +31,8 @@ export async function POST(request: Request) {
     return new NextResponse("Share signing unavailable", { status: 500 });
   }
   const sharePath = `/share?payload=${encodedPayload}&sig=${sig}`;
-  const origin = new URL(request.url).origin;
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/+$/g, "");
+  const origin = baseUrl || new URL(request.url).origin;
   const shareUrl = new URL(sharePath, origin).toString();
 
   return NextResponse.json({ sharePath, shareUrl });

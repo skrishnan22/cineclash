@@ -1,3 +1,5 @@
+import { readFile } from "node:fs/promises";
+import path from "node:path";
 import { ImageResponse } from "next/og";
 
 import { verifySignedSharePayload } from "@/lib/share-signature";
@@ -5,11 +7,24 @@ import { verifySignedSharePayload } from "@/lib/share-signature";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
+const fontBasePath = path.join(process.cwd(), "public", "fonts");
+const antonFont = readFile(path.join(fontBasePath, "Anton-Regular.ttf"));
+const manropeMediumFont = readFile(
+  path.join(fontBasePath, "Manrope-Medium.ttf"),
+);
+const manropeBoldFont = readFile(path.join(fontBasePath, "Manrope-Bold.ttf"));
+
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const payload = searchParams.get("payload");
   const sig = searchParams.get("sig");
   const verified = verifySignedSharePayload(payload, sig);
+
+  const [antonData, manropeMediumData, manropeBoldData] = await Promise.all([
+    antonFont,
+    manropeMediumFont,
+    manropeBoldFont,
+  ]);
 
   const score = verified?.score ?? 0;
   const totalGuesses = verified?.totalGuesses ?? 0;
@@ -29,6 +44,8 @@ export async function GET(request: Request) {
           justifyContent: "center",
           backgroundColor: "#09090b",
           padding: 50,
+          fontFamily: "Manrope",
+          fontWeight: 500,
         }}
       >
         {/* Ticket container */}
@@ -48,6 +65,7 @@ export async function GET(request: Request) {
               position: "absolute",
               top: -18,
               left: 252,
+              display: "flex",
               width: 36,
               height: 36,
               borderRadius: 18,
@@ -59,6 +77,7 @@ export async function GET(request: Request) {
               position: "absolute",
               bottom: -18,
               left: 252,
+              display: "flex",
               width: 36,
               height: 36,
               borderRadius: 18,
@@ -80,11 +99,13 @@ export async function GET(request: Request) {
               style={{
                 display: "flex",
                 transform: "rotate(-90deg)",
-                fontSize: 56,
-                fontWeight: 700,
-                letterSpacing: "0.3em",
+                fontSize: 52,
+                fontWeight: 400,
+                letterSpacing: "0.25em",
                 color: "rgba(12, 74, 110, 0.25)",
+                lineHeight: 1,
                 whiteSpace: "nowrap",
+                fontFamily: "Anton",
               }}
             >
               ADMIT ONE
@@ -108,6 +129,7 @@ export async function GET(request: Request) {
               <div
                 key={i}
                 style={{
+                  display: "flex",
                   width: 3,
                   height: 14,
                   backgroundColor: "rgba(0, 0, 0, 0.15)",
@@ -194,16 +216,19 @@ export async function GET(request: Request) {
               {/* Header */}
               <div
                 style={{
+                  display: "flex",
                   fontSize: 48,
-                  fontWeight: 700,
+                  fontWeight: 400,
                   letterSpacing: "0.2em",
                   color: "#0c4a6e",
+                  fontFamily: "Anton",
                 }}
               >
                 CINECLASH
               </div>
               <div
                 style={{
+                  display: "flex",
                   fontSize: 14,
                   letterSpacing: "0.4em",
                   color: "rgba(12, 74, 110, 0.4)",
@@ -224,29 +249,33 @@ export async function GET(request: Request) {
               >
                 <div
                   style={{
-                    fontSize: 28,
-                    color: "rgba(56, 189, 248, 0.5)",
+                    display: "flex",
+                    fontSize: 40,
+                    color: "#f2c94c",
                   }}
                 >
-                  ★
+                  *
                 </div>
                 <div
                   style={{
+                    display: "flex",
                     fontSize: 160,
-                    fontWeight: 700,
+                    fontWeight: 400,
                     color: "#0284c7",
                     lineHeight: 1,
+                    fontFamily: "Anton",
                   }}
                 >
                   {score}
                 </div>
                 <div
                   style={{
-                    fontSize: 28,
-                    color: "rgba(56, 189, 248, 0.5)",
+                    display: "flex",
+                    fontSize: 40,
+                    color: "#f2c94c",
                   }}
                 >
-                  ★
+                  *
                 </div>
               </div>
               <div
@@ -284,15 +313,18 @@ export async function GET(request: Request) {
                 >
                   <div
                     style={{
+                      display: "flex",
                       fontSize: 36,
-                      fontWeight: 700,
+                      fontWeight: 400,
                       color: "#0c4a6e",
+                      fontFamily: "Anton",
                     }}
                   >
                     {totalGuesses}
                   </div>
                   <div
                     style={{
+                      display: "flex",
                       fontSize: 11,
                       letterSpacing: "0.2em",
                       color: "rgba(12, 74, 110, 0.45)",
@@ -310,15 +342,18 @@ export async function GET(request: Request) {
                 >
                   <div
                     style={{
+                      display: "flex",
                       fontSize: 36,
-                      fontWeight: 700,
+                      fontWeight: 400,
                       color: "#0c4a6e",
+                      fontFamily: "Anton",
                     }}
                   >
                     {accuracy}%
                   </div>
                   <div
                     style={{
+                      display: "flex",
                       fontSize: 11,
                       letterSpacing: "0.2em",
                       color: "rgba(12, 74, 110, 0.45)",
@@ -336,6 +371,26 @@ export async function GET(request: Request) {
     {
       width: 1200,
       height: 630,
+      fonts: [
+        {
+          name: "Anton",
+          data: antonData,
+          weight: 400,
+          style: "normal",
+        },
+        {
+          name: "Manrope",
+          data: manropeMediumData,
+          weight: 500,
+          style: "normal",
+        },
+        {
+          name: "Manrope",
+          data: manropeBoldData,
+          weight: 700,
+          style: "normal",
+        },
+      ],
     },
   );
 
