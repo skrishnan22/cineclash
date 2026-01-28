@@ -233,6 +233,7 @@ export default function MovieGame({ movies }: MovieGameProps) {
   );
   const [shareFeedback, setShareFeedback] = useState<string | null>(null);
   const [canCopyImage, setCanCopyImage] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
   const feedbackTimerRef = useRef<number | null>(null);
 
   const playableMovies = useMemo(
@@ -246,6 +247,15 @@ export default function MovieGame({ movies }: MovieGameProps) {
   }, [state.phase]);
 
   useEffect(() => {
+    // Detect mobile devices
+    const mobileCheck =
+      /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+        navigator.userAgent,
+      ) ||
+      (navigator.maxTouchPoints > 0 && window.innerWidth < 768);
+    setIsMobile(mobileCheck);
+
+    // Check clipboard image support (only reliable on desktop)
     const supportsClipboardItem =
       typeof ClipboardItem !== "undefined" &&
       (typeof ClipboardItem.supports !== "function" ||
@@ -256,7 +266,10 @@ export default function MovieGame({ movies }: MovieGameProps) {
       window.isSecureContext && supportsClipboardItem && supportsClipboardWrite;
     const supportsExecCopy =
       (document.queryCommandSupported?.("copy") ?? false) === true;
-    setCanCopyImage(supportsClipboardImage || supportsExecCopy);
+    // Only enable copy image on non-mobile devices
+    setCanCopyImage(
+      !mobileCheck && (supportsClipboardImage || supportsExecCopy),
+    );
   }, []);
 
   useEffect(
@@ -693,7 +706,7 @@ export default function MovieGame({ movies }: MovieGameProps) {
 
                   {/* Score */}
                   <div className="flex-1 flex items-center justify-center gap-6 sm:gap-12 w-full my-2">
-                    <div className="hidden sm:block text-sky-400/60">
+                    <div className="hidden sm:block">
                       <StarIcon />
                     </div>
 
@@ -708,7 +721,7 @@ export default function MovieGame({ movies }: MovieGameProps) {
                       </div>
                     </div>
 
-                    <div className="hidden sm:block text-sky-400/60">
+                    <div className="hidden sm:block">
                       <StarIcon />
                     </div>
                   </div>
@@ -739,15 +752,26 @@ export default function MovieGame({ movies }: MovieGameProps) {
           </div>
           <div className="mt-6 flex flex-col items-center gap-2">
             <div className="flex flex-wrap justify-center gap-2 sm:gap-3">
-              {canCopyImage && (
+              {isMobile ? (
                 <button
-                  onClick={handleCopyImage}
+                  onClick={handleShare}
                   disabled={shareStatus === "loading"}
                   className="px-4 sm:px-6 py-2 border border-sky-400 text-sky-700 font-bold font-mono text-[10px] sm:text-xs uppercase tracking-widest hover:bg-sky-100 transition-colors rounded hover:shadow-sm transform hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-50"
-                  title="Copy score image"
+                  title="Share your score"
                 >
-                  COPY IMAGE TO SHARE
+                  SHARE SCORE
                 </button>
+              ) : (
+                canCopyImage && (
+                  <button
+                    onClick={handleCopyImage}
+                    disabled={shareStatus === "loading"}
+                    className="px-4 sm:px-6 py-2 border border-sky-400 text-sky-700 font-bold font-mono text-[10px] sm:text-xs uppercase tracking-widest hover:bg-sky-100 transition-colors rounded hover:shadow-sm transform hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-50"
+                    title="Copy score image"
+                  >
+                    COPY IMAGE TO SHARE
+                  </button>
+                )
               )}
               <button
                 onClick={handleReset}
