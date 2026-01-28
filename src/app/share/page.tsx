@@ -3,6 +3,7 @@ import { headers } from "next/headers";
 
 import { buildShareTitle, SHARE_DESCRIPTION } from "@/lib/share-text";
 import { verifySignedSharePayload } from "@/lib/share-signature";
+import ShareRedirect from "./share-redirect";
 
 export const dynamic = "force-dynamic";
 
@@ -65,5 +66,5 @@ export async function generateMetadata({
 }
 
 export default function SharePage() {
-  return null;
+  return <ShareRedirect />;
 }

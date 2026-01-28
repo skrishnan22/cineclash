@@ -258,11 +258,42 @@ export default function MovieGame({ movies }: MovieGameProps) {
     }
   };
 
+  const fetchShareImage = async (shareUrl: string) => {
+    const ogUrl = `/share/og${new URL(shareUrl).search}`;
+    const res = await fetch(ogUrl);
+    if (!res.ok) return null;
+    return res.blob();
+  };
+
   const handleShare = async () => {
     setShareStatus("loading");
     try {
       const url = await ensureShareUrl();
       const text = buildShareText(state.score, state.totalGuesses);
+
+      // Try Web Share API with image (works on mobile + modern desktop)
+      if (navigator.share) {
+        try {
+          const blob = await fetchShareImage(url);
+          if (blob) {
+            const file = new File([blob], "cineclash-score.png", { type: "image/png" });
+            if (navigator.canShare?.({ files: [file] })) {
+              await navigator.share({ text, url, files: [file] });
+              setShareStatus("idle");
+              return;
+            }
+          }
+        } catch (e) {
+          // User cancelled the share sheet — not an error
+          if (e instanceof Error && e.name === "AbortError") {
+            setShareStatus("idle");
+            return;
+          }
+          // Fall through to Twitter intent
+        }
+      }
+
+      // Fallback: Twitter intent (OG image shows automatically via card meta)
       window.open(buildTwitterIntentUrl({ text, url }), "_blank");
       setShareStatus("idle");
     } catch {
@@ -270,13 +301,21 @@ export default function MovieGame({ movies }: MovieGameProps) {
     }
   };
 
-  const handleCopyLink = async () => {
+  const handleSaveImage = async () => {
     setShareStatus("loading");
     try {
       const url = await ensureShareUrl();
-      await navigator.clipboard.writeText(url);
-      setShareStatus("copied");
-      setTimeout(() => setShareStatus("idle"), 2000);
+      const blob = await fetchShareImage(url);
+      if (!blob) throw new Error("Failed to generate image");
+      const blobUrl = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = blobUrl;
+      a.download = "cineclash-score.png";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(blobUrl);
+      setShareStatus("idle");
     } catch {
       setShareStatus("error");
     }
@@ -413,16 +452,25 @@ export default function MovieGame({ movies }: MovieGameProps) {
                        <div className="font-mono text-[9px] text-sky-900/50 uppercase tracking-wider">Rounds</div>
                      </div>
                      
-                     <div className="flex justify-center gap-3">
-                        <button 
+                     <div className="flex justify-center gap-2 sm:gap-3">
+                        <button
                           onClick={handleShare}
-                          className="px-6 py-2 bg-sky-600 text-white font-bold font-mono text-[10px] sm:text-xs uppercase tracking-widest hover:bg-sky-700 transition-colors rounded shadow-sm hover:shadow-md transform hover:-translate-y-0.5 active:translate-y-0"
+                          disabled={shareStatus === "loading"}
+                          className="px-4 sm:px-6 py-2 bg-sky-600 text-white font-bold font-mono text-[10px] sm:text-xs uppercase tracking-widest hover:bg-sky-700 transition-colors rounded shadow-sm hover:shadow-md transform hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-50"
                         >
                           {shareStatus === "loading" ? "..." : "SHARE"}
                         </button>
-                        <button 
+                        <button
+                          onClick={handleSaveImage}
+                          disabled={shareStatus === "loading"}
+                          className="px-4 sm:px-6 py-2 border border-sky-400 text-sky-700 font-bold font-mono text-[10px] sm:text-xs uppercase tracking-widest hover:bg-sky-100 transition-colors rounded hover:shadow-sm transform hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-50"
+                          title="Save score image"
+                        >
+                          SAVE
+                        </button>
+                        <button
                           onClick={handleReset}
-                          className="px-6 py-2 border border-sky-400 text-sky-700 font-bold font-mono text-[10px] sm:text-xs uppercase tracking-widest hover:bg-sky-100 transition-colors rounded hover:shadow-sm transform hover:-translate-y-0.5 active:translate-y-0"
+                          className="px-4 sm:px-6 py-2 border border-sky-400 text-sky-700 font-bold font-mono text-[10px] sm:text-xs uppercase tracking-widest hover:bg-sky-100 transition-colors rounded hover:shadow-sm transform hover:-translate-y-0.5 active:translate-y-0"
                         >
                           REPLAY
                         </button>
