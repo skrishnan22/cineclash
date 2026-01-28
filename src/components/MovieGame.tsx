@@ -436,20 +436,22 @@ export default function MovieGame({ movies }: MovieGameProps) {
     setFeedback(null);
     trackEvent("share_attempt", { method: "share_button" });
     try {
-      const url = await ensureShareUrl();
       const text = buildShareText(state.score, state.totalGuesses);
+      const baseUrl = window.location.origin;
 
       // Try Web Share API with image (works on mobile + modern desktop)
       if (navigator.share) {
         try {
-          const blob = await fetchShareImage(url);
+          // Generate image URL for fetching (still needs params internally)
+          const shareUrlForImage = await ensureShareUrl();
+          const blob = await fetchShareImage(shareUrlForImage);
           if (blob) {
             const file = new File([blob], "cineclash-score.png", {
               type: "image/png",
             });
             if (navigator.canShare?.({ files: [file] })) {
               trackEvent("share_attempt", { method: "web_share_image" });
-              await navigator.share({ text, url, files: [file] });
+              await navigator.share({ text, url: baseUrl, files: [file] });
               trackEvent("share_success", { method: "web_share_image" });
               setShareStatus("idle");
               setFeedback("Shared");
@@ -471,7 +473,7 @@ export default function MovieGame({ movies }: MovieGameProps) {
 
         try {
           trackEvent("share_attempt", { method: "web_share_text" });
-          await navigator.share({ text, url });
+          await navigator.share({ text, url: baseUrl });
           trackEvent("share_success", { method: "web_share_text" });
           setShareStatus("idle");
           setFeedback("Shared");
@@ -489,10 +491,10 @@ export default function MovieGame({ movies }: MovieGameProps) {
         }
       }
 
-      // Fallback: Twitter intent (OG image shows automatically via card meta)
+      // Fallback: Twitter intent
       trackEvent("share_attempt", { method: "twitter_intent" });
       window.open(
-        buildTwitterIntentUrl({ text, url }),
+        buildTwitterIntentUrl({ text, url: baseUrl }),
         "_blank",
         "noopener,noreferrer",
       );

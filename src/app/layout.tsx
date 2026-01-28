@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Anton, Manrope } from "next/font/google";
+import { Analytics } from "@vercel/analytics/react";
 import "./globals.css";
 
 const titleFont = Anton({
@@ -30,6 +31,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${titleFont.variable} ${bodyFont.variable} antialiased`}>
         {children}
+        <Analytics />
       </body>
     </html>
   );
