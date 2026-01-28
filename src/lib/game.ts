@@ -20,6 +20,7 @@ export type GameState = {
   completedAt: number | null;
   rounds: Round[];
   activeRound: Round | null;
+  upcomingRounds: Round[];
   remaining: Movie[];
   error: string | null;
 };
@@ -39,6 +40,7 @@ export const createInitialState = (): GameState => ({
   completedAt: null,
   rounds: [],
   activeRound: null,
+  upcomingRounds: [],
   remaining: [],
   error: null,
 });
@@ -97,6 +99,23 @@ export const drawRound = (
   };
 };
 
+export const drawMultipleRounds = (
+  remaining: Movie[],
+  count: number,
+): { rounds: Round[]; remaining: Movie[] } => {
+  const rounds: Round[] = [];
+  let pool = [...remaining];
+
+  for (let i = 0; i < count; i += 1) {
+    const result = drawRound(pool);
+    if (!result) break;
+    rounds.push(result.round);
+    pool = result.remaining;
+  }
+
+  return { rounds, remaining: pool };
+};
+
 export const evaluateGuess = (round: Round, guess: Guess): Outcome => {
   const leftRating = round.left.rating ?? 0;
   const rightRating = round.right.rating ?? 0;
@@ -123,14 +142,17 @@ export const gameReducer = (state: GameState, action: GameAction): GameState => 
         };
       }
 
-      const draw = drawRound(pool);
+      // Draw 4 rounds upfront: 1 active + 3 upcoming for prefetching
+      const { rounds: drawnRounds, remaining } = drawMultipleRounds(pool, 4);
 
-      if (!draw) {
+      if (drawnRounds.length === 0) {
         return {
           ...createInitialState(),
           error: "Unable to find a valid starting pair.",
         };
       }
+
+      const [activeRound, ...upcomingRounds] = drawnRounds;
 
       return {
         phase: "guess",
@@ -140,8 +162,9 @@ export const gameReducer = (state: GameState, action: GameAction): GameState => 
         startedAt: action.now,
         completedAt: null,
         rounds: [],
-        activeRound: draw.round,
-        remaining: draw.remaining,
+        activeRound,
+        upcomingRounds,
+        remaining,
         error: null,
       };
     }
@@ -183,22 +206,42 @@ export const gameReducer = (state: GameState, action: GameAction): GameState => 
         };
       }
 
-      const draw = drawRound(state.remaining);
+      // Pop next round from queue
+      const [nextRound, ...remainingUpcoming] = state.upcomingRounds;
 
-      if (!draw) {
+      if (!nextRound) {
+        // Queue is empty, try to draw directly
+        const draw = drawRound(state.remaining);
+        if (!draw) {
+          return {
+            ...state,
+            phase: "complete",
+            completedAt: action.now,
+            error: "Out of movies.",
+          };
+        }
         return {
           ...state,
-          phase: "complete",
-          completedAt: action.now,
-          error: "Out of movies.",
+          phase: "guess",
+          activeRound: draw.round,
+          upcomingRounds: [],
+          remaining: draw.remaining,
         };
       }
+
+      // Draw 1 more round to replenish the queue
+      const draw = drawRound(state.remaining);
+      const newUpcoming = draw
+        ? [...remainingUpcoming, draw.round]
+        : remainingUpcoming;
+      const newRemaining = draw ? draw.remaining : state.remaining;
 
       return {
         ...state,
         phase: "guess",
-        activeRound: draw.round,
-        remaining: draw.remaining,
+        activeRound: nextRound,
+        upcomingRounds: newUpcoming,
+        remaining: newRemaining,
       };
     }
     case "reset":

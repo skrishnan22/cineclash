@@ -2,6 +2,7 @@ import { describe, expect, it, vi } from "vitest";
 import {
   createInitialState,
   drawRound,
+  drawMultipleRounds,
   evaluateGuess,
   gameReducer,
   sanitizeMovies,
@@ -55,6 +56,43 @@ describe("drawRound", () => {
     spy.mockRestore();
 
     expect(result).toBeNull();
+  });
+});
+
+describe("drawMultipleRounds", () => {
+  it("draws multiple rounds and removes movies from remaining", () => {
+    const movies = [
+      makeMovie("a", 8.0),
+      makeMovie("b", 7.0),
+      makeMovie("c", 6.0),
+      makeMovie("d", 5.0),
+      makeMovie("e", 4.0),
+      makeMovie("f", 3.0),
+    ];
+    const spy = vi.spyOn(Math, "random").mockReturnValue(0);
+
+    const result = drawMultipleRounds(movies, 3);
+
+    spy.mockRestore();
+
+    expect(result.rounds).toHaveLength(3);
+    expect(result.remaining).toHaveLength(0);
+  });
+
+  it("returns fewer rounds if pool is exhausted", () => {
+    const movies = [
+      makeMovie("a", 8.0),
+      makeMovie("b", 7.0),
+      makeMovie("c", 6.0),
+    ];
+    const spy = vi.spyOn(Math, "random").mockReturnValue(0);
+
+    const result = drawMultipleRounds(movies, 5);
+
+    spy.mockRestore();
+
+    expect(result.rounds).toHaveLength(1);
+    expect(result.remaining).toHaveLength(1);
   });
 });
 

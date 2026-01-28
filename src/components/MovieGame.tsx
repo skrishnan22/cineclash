@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useEffect, useMemo, useReducer, useRef, useState } from "react";
-import { createInitialState, gameReducer, type Guess } from "@/lib/game";
+import { createInitialState, gameReducer, type Guess, type Round } from "@/lib/game";
 import type { Movie } from "@/lib/movies";
 import { trackEvent } from "@/lib/analytics";
 import { buildTwitterIntentUrl } from "@/lib/share-actions";
@@ -106,6 +106,19 @@ const StarIcon = () => (
 /* ------------------------------------------------------------------ */
 /*  Components                                                        */
 /* ------------------------------------------------------------------ */
+
+const PosterPrefetcher = ({ rounds }: { rounds: Round[] }) => {
+  useEffect(() => {
+    rounds.forEach((round) => {
+      const leftUrl = getPosterUrl(round.left);
+      const rightUrl = getPosterUrl(round.right);
+      if (leftUrl) fetch(leftUrl);
+      if (rightUrl) fetch(rightUrl);
+    });
+  }, [rounds]);
+
+  return null;
+};
 
 const MovieCard = ({
   movie,
@@ -811,6 +824,9 @@ export default function MovieGame({ movies }: MovieGameProps) {
 
     return (
       <main className="h-screen w-full flex flex-col relative bg-zinc-950 overflow-hidden">
+        {/* Prefetch posters for upcoming rounds */}
+        <PosterPrefetcher rounds={state.upcomingRounds} />
+
         {/* Ambient Background Spotlights */}
         <div className="absolute top-1/2 left-1/4 w-[500px] h-[500px] bg-indigo-900/20 rounded-full blur-[128px] pointer-events-none -translate-y-1/2" />
         <div className="absolute top-1/2 right-1/4 w-[500px] h-[500px] bg-purple-900/20 rounded-full blur-[128px] pointer-events-none -translate-y-1/2" />
