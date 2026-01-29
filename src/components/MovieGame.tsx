@@ -112,8 +112,15 @@ const PosterPrefetcher = ({ rounds }: { rounds: Round[] }) => {
     rounds.forEach((round) => {
       const leftUrl = getPosterUrl(round.left);
       const rightUrl = getPosterUrl(round.right);
-      if (leftUrl) fetch(leftUrl);
-      if (rightUrl) fetch(rightUrl);
+      // Use Image objects instead of fetch() to properly prime browser cache
+      if (leftUrl) {
+        const img = new window.Image();
+        img.src = leftUrl;
+      }
+      if (rightUrl) {
+        const img = new window.Image();
+        img.src = rightUrl;
+      }
     });
   }, [rounds]);
 
@@ -144,6 +151,7 @@ const MovieCard = ({
   const title = movie.title ?? "Untitled";
   const posterUrl = getPosterUrl(movie);
   const [imageFailed, setImageFailed] = useState(false);
+  const [imageLoaded, setImageLoaded] = useState(false);
   const effectivePosterUrl = imageFailed ? null : posterUrl;
 
   return (
@@ -160,13 +168,24 @@ const MovieCard = ({
       <div
         className={`absolute inset-0 transition-transform duration-700 ease-out ${!reveal && !disabled ? "group-hover:scale-105" : ""}`}
       >
+        {/* Loading placeholder - shown while image loads */}
+        {effectivePosterUrl && !imageLoaded && (
+          <div className="absolute inset-0 bg-zinc-800 animate-pulse" />
+        )}
         {effectivePosterUrl ? (
           <Image
             src={effectivePosterUrl}
             alt={title}
             fill
             sizes="(min-width: 1024px) 50vw, 100vw"
-            className={`object-cover transition-opacity duration-500 ${reveal && isLoser ? "opacity-30 grayscale" : "opacity-60 group-hover:opacity-80"}`}
+            className={`object-cover transition-opacity duration-300 ${
+              !imageLoaded
+                ? "opacity-0"
+                : reveal && isLoser
+                  ? "opacity-30 grayscale"
+                  : "opacity-60 group-hover:opacity-80"
+            }`}
+            onLoad={() => setImageLoaded(true)}
             onError={() => setImageFailed(true)}
             priority
           />
@@ -858,6 +877,7 @@ export default function MovieGame({ movies }: MovieGameProps) {
             {/* Left Poster */}
             <div className="relative w-full lg:w-[400px] aspect-[2/3] max-h-[calc(42vh-60px)] sm:max-h-[38vh] lg:max-h-[70vh] flex-shrink-0 perspective-1000">
               <MovieCard
+                key={`left-${activeRound.left.id}`}
                 movie={activeRound.left}
                 reveal={isReveal}
                 label="Challenger 01"
@@ -891,6 +911,7 @@ export default function MovieGame({ movies }: MovieGameProps) {
             {/* Right Poster */}
             <div className="relative w-full lg:w-[400px] aspect-[2/3] max-h-[calc(42vh-60px)] sm:max-h-[38vh] lg:max-h-[70vh] flex-shrink-0 perspective-1000">
               <MovieCard
+                key={`right-${activeRound.right.id}`}
                 movie={activeRound.right}
                 reveal={isReveal}
                 label="Challenger 02"
