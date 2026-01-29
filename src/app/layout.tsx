@@ -17,9 +17,24 @@ const bodyFont = Manrope({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://cineclash.quest"),
   title: "CineClash",
   description:
     "Pick which movie has the higher IMDb rating and share your score.",
+  openGraph: {
+    title: "CineClash",
+    description:
+      "Pick which movie has the higher IMDb rating and share your score.",
+    url: "https://cineclash.quest",
+    siteName: "CineClash",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "CineClash",
+    description:
+      "Pick which movie has the higher IMDb rating and share your score.",
+  },
 };
 
 export default function RootLayout({
