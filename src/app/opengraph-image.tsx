@@ -2,6 +2,8 @@ import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { ImageResponse } from "next/og";
 
+import moviesData from "@/../data/movies.json";
+
 export const runtime = "nodejs";
 export const alt = "CineClash - Pick which movie has the higher IMDb rating";
 export const size = {
@@ -12,17 +14,19 @@ export const contentType = "image/png";
 
 const fontBasePath = path.join(process.cwd(), "public", "fonts");
 const antonFont = readFile(path.join(fontBasePath, "Anton-Regular.ttf"));
-const manropeMediumFont = readFile(
-  path.join(fontBasePath, "Manrope-Medium.ttf"),
-);
+const manropeBoldFont = readFile(path.join(fontBasePath, "Manrope-Bold.ttf"));
+
+// Pick two iconic movies (ranks 1 and 2)
+const movie1 = moviesData.movies[0]!; // The Shawshank Redemption
+const movie2 = moviesData.movies[1]!; // The Godfather
+const poster1 = movie1.posterUrl ?? movie1.posterUrlLarge ?? "";
+const poster2 = movie2.posterUrl ?? movie2.posterUrlLarge ?? "";
 
 export default async function Image() {
-  const [antonData, manropeMediumData] = await Promise.all([
+  const [antonData, manropeBoldData] = await Promise.all([
     antonFont,
-    manropeMediumFont,
+    manropeBoldFont,
   ]);
-
-  const dashes = Array.from({ length: 22 }, (_, i) => i);
 
   return new ImageResponse(
     (
@@ -31,243 +35,181 @@ export default async function Image() {
           width: 1200,
           height: 630,
           display: "flex",
+          flexDirection: "column",
           alignItems: "center",
           justifyContent: "center",
           backgroundColor: "#09090b",
-          padding: 50,
           fontFamily: "Manrope",
-          fontWeight: 500,
+          position: "relative",
+          overflow: "hidden",
         }}
       >
-        {/* Ticket container */}
+        {/* Subtle gradient overlay */}
         <div
           style={{
-            width: "100%",
-            height: "100%",
+            position: "absolute",
+            inset: 0,
+            background:
+              "radial-gradient(ellipse at center, rgba(56, 189, 248, 0.08) 0%, transparent 70%)",
+          }}
+        />
+
+        {/* Title */}
+        <div
+          style={{
             display: "flex",
-            backgroundColor: "#38bdf8",
-            borderRadius: 14,
-            position: "relative",
+            fontSize: 56,
+            fontWeight: 400,
+            letterSpacing: "0.2em",
+            color: "#38bdf8",
+            fontFamily: "Anton",
+            marginBottom: 32,
           }}
         >
-          {/* Notch circles at stub divider */}
-          <div
-            style={{
-              position: "absolute",
-              top: -18,
-              left: 252,
-              display: "flex",
-              width: 36,
-              height: 36,
-              borderRadius: 18,
-              backgroundColor: "#09090b",
-            }}
-          />
-          <div
-            style={{
-              position: "absolute",
-              bottom: -18,
-              left: 252,
-              display: "flex",
-              width: 36,
-              height: 36,
-              borderRadius: 18,
-              backgroundColor: "#09090b",
-            }}
-          />
+          CINECLASH
+        </div>
 
-          {/* Left stub */}
+        {/* Posters container */}
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 60,
+          }}
+        >
+          {/* Movie 1 poster */}
           <div
             style={{
-              width: 270,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              position: "relative",
-            }}
-          >
-            <div
-              style={{
-                display: "flex",
-                transform: "rotate(-90deg)",
-                fontSize: 52,
-                fontWeight: 400,
-                letterSpacing: "0.25em",
-                color: "rgba(12, 74, 110, 0.25)",
-                lineHeight: 1,
-                whiteSpace: "nowrap",
-                fontFamily: "Anton",
-              }}
-            >
-              ADMIT ONE
-            </div>
-          </div>
-
-          {/* Dashed divider */}
-          <div
-            style={{
-              width: 4,
               display: "flex",
               flexDirection: "column",
               alignItems: "center",
-              justifyContent: "center",
-              gap: 8,
-              paddingTop: 24,
-              paddingBottom: 24,
+              gap: 12,
             }}
           >
-            {dashes.map((i) => (
-              <div
-                key={i}
-                style={{
-                  display: "flex",
-                  width: 3,
-                  height: 14,
-                  backgroundColor: "rgba(0, 0, 0, 0.15)",
-                  borderRadius: 2,
-                  flexShrink: 0,
-                }}
-              />
-            ))}
-          </div>
-
-          {/* Right body */}
-          <div
-            style={{
-              flex: 1,
-              display: "flex",
-              padding: 30,
-              paddingLeft: 26,
-            }}
-          >
-            {/* Inner cream card */}
             <div
               style={{
-                flex: 1,
-                backgroundColor: "#fdf6e7",
-                borderRadius: 10,
                 display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                justifyContent: "center",
-                padding: "28px 50px",
-                position: "relative",
+                borderRadius: 12,
+                overflow: "hidden",
+                boxShadow: "0 20px 40px rgba(0,0,0,0.5), 0 0 60px rgba(56, 189, 248, 0.15)",
               }}
             >
-              {/* Corner decorations */}
-              <div
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={poster1}
+                width={220}
+                height={330}
+                alt={movie1.title}
                 style={{
-                  position: "absolute",
-                  top: 12,
-                  left: 12,
-                  width: 28,
-                  height: 28,
-                  borderTop: "2px solid rgba(12, 74, 110, 0.15)",
-                  borderLeft: "2px solid rgba(12, 74, 110, 0.15)",
-                  borderTopLeftRadius: 10,
+                  objectFit: "cover",
                 }}
               />
-              <div
-                style={{
-                  position: "absolute",
-                  top: 12,
-                  right: 12,
-                  width: 28,
-                  height: 28,
-                  borderTop: "2px solid rgba(12, 74, 110, 0.15)",
-                  borderRight: "2px solid rgba(12, 74, 110, 0.15)",
-                  borderTopRightRadius: 10,
-                }}
-              />
-              <div
-                style={{
-                  position: "absolute",
-                  bottom: 12,
-                  left: 12,
-                  width: 28,
-                  height: 28,
-                  borderBottom: "2px solid rgba(12, 74, 110, 0.15)",
-                  borderLeft: "2px solid rgba(12, 74, 110, 0.15)",
-                  borderBottomLeftRadius: 10,
-                }}
-              />
-              <div
-                style={{
-                  position: "absolute",
-                  bottom: 12,
-                  right: 12,
-                  width: 28,
-                  height: 28,
-                  borderBottom: "2px solid rgba(12, 74, 110, 0.15)",
-                  borderRight: "2px solid rgba(12, 74, 110, 0.15)",
-                  borderBottomRightRadius: 10,
-                }}
-              />
+            </div>
+            <div
+              style={{
+                display: "flex",
+                fontSize: 16,
+                color: "rgba(255,255,255,0.6)",
+                fontWeight: 700,
+                maxWidth: 220,
+                textAlign: "center",
+              }}
+            >
+              {movie1.title}
+            </div>
+          </div>
 
-              {/* Header */}
+          {/* VS Badge */}
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              gap: 8,
+            }}
+          >
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                width: 80,
+                height: 80,
+                borderRadius: 40,
+                backgroundColor: "#38bdf8",
+                boxShadow: "0 0 40px rgba(56, 189, 248, 0.4)",
+              }}
+            >
               <div
                 style={{
                   display: "flex",
-                  fontSize: 72,
+                  fontSize: 32,
                   fontWeight: 400,
-                  letterSpacing: "0.15em",
                   color: "#0c4a6e",
                   fontFamily: "Anton",
+                  letterSpacing: "0.05em",
                 }}
               >
-                CINECLASH
-              </div>
-              <div
-                style={{
-                  display: "flex",
-                  fontSize: 14,
-                  letterSpacing: "0.4em",
-                  color: "rgba(12, 74, 110, 0.4)",
-                  marginTop: 8,
-                }}
-              >
-                CINECLASH.QUEST
-              </div>
-
-              {/* Tagline */}
-              <div
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "center",
-                  marginTop: 40,
-                  gap: 12,
-                }}
-              >
-                <div
-                  style={{
-                    display: "flex",
-                    fontSize: 28,
-                    color: "#0284c7",
-                    fontWeight: 500,
-                    textAlign: "center",
-                  }}
-                >
-                  Pick which movie has the higher IMDb rating
-                </div>
-                <div
-                  style={{
-                    display: "flex",
-                    padding: "10px 28px",
-                    backgroundColor: "#0284c7",
-                    borderRadius: 999,
-                    fontSize: 16,
-                    fontWeight: 600,
-                    letterSpacing: "0.1em",
-                    color: "#ffffff",
-                    marginTop: 16,
-                  }}
-                >
-                  PLAY NOW
-                </div>
+                VS
               </div>
             </div>
           </div>
+
+          {/* Movie 2 poster */}
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              gap: 12,
+            }}
+          >
+            <div
+              style={{
+                display: "flex",
+                borderRadius: 12,
+                overflow: "hidden",
+                boxShadow: "0 20px 40px rgba(0,0,0,0.5), 0 0 60px rgba(56, 189, 248, 0.15)",
+              }}
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={poster2}
+                width={220}
+                height={330}
+                alt={movie2.title}
+                style={{
+                  objectFit: "cover",
+                }}
+              />
+            </div>
+            <div
+              style={{
+                display: "flex",
+                fontSize: 16,
+                color: "rgba(255,255,255,0.6)",
+                fontWeight: 700,
+                maxWidth: 220,
+                textAlign: "center",
+              }}
+            >
+              {movie2.title}
+            </div>
+          </div>
+        </div>
+
+        {/* Tagline */}
+        <div
+          style={{
+            display: "flex",
+            fontSize: 24,
+            color: "rgba(255,255,255,0.8)",
+            marginTop: 32,
+            fontWeight: 700,
+          }}
+        >
+          Which has the higher IMDb rating?
         </div>
       </div>
     ),
@@ -282,8 +224,8 @@ export default async function Image() {
         },
         {
           name: "Manrope",
-          data: manropeMediumData,
-          weight: 500,
+          data: manropeBoldData,
+          weight: 700,
           style: "normal",
         },
       ],
